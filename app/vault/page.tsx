@@ -28,7 +28,7 @@ export default function VaultPage() {
     }
 
     if (parseFloat(depositAmount) > parseFloat(vaultData.userTokenBalance)) {
-      toast.error('Insufficient CCT balance');
+      toast.error('Insufficient RWA token balance');
       return;
     }
 
@@ -87,10 +87,10 @@ export default function VaultPage() {
             OMNI<span className="text-[#4a90e2]">FI</span> VAULT
           </h1>
           <p className="text-xl text-[#1a2332] font-bold">
-            Carbon Credit Token Vault with Dynamic Limits
+            Real-World Asset Token Vault with Dynamic Limits
           </p>
           <Badge variant="outline" className="border-2 border-[#4a90e2] text-[#4a90e2] font-bold px-4 py-2">
-            Powered by Chainlink Price Feeds
+            Powered by Chainlink Data Feeds
           </Badge>
         </div>
 
@@ -190,7 +190,7 @@ export default function VaultPage() {
                   <Separator className="bg-[#1a2332] h-0.5" />
                   
                   <div className="space-y-2">
-                    <Label className="text-[#1a2332] font-bold">Your CCT Balance</Label>
+                    <Label className="text-[#1a2332] font-bold">Your RWA Token Balance</Label>
                     <div className="text-2xl font-black text-[#4a90e2]">
                       {formatNumber(vaultData.userTokenBalance, 4)} CCT
                     </div>
@@ -219,10 +219,10 @@ export default function VaultPage() {
                   <CardHeader>
                     <CardTitle className="text-2xl font-black text-[#1a2332] flex items-center gap-2">
                       <ArrowUpRight className="w-6 h-6 text-green-600" />
-                      Deposit CCT
+                      Deposit RWA Tokens
                     </CardTitle>
                     <CardDescription className="text-[#1a2332] font-semibold">
-                      Deposit your Carbon Credit Tokens to the vault
+                      Deposit your RWA tokens to the vault
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -292,7 +292,7 @@ export default function VaultPage() {
                       ) : (
                         <>
                           <Coins className="w-4 h-4 mr-2" />
-                          Deposit CCT
+                          Deposit Tokens
                         </>
                       )}
                     </Button>
@@ -304,10 +304,10 @@ export default function VaultPage() {
                   <CardHeader>
                     <CardTitle className="text-2xl font-black text-[#1a2332] flex items-center gap-2">
                       <ArrowDownRight className="w-6 h-6 text-red-600" />
-                      Withdraw CCT
+                      Withdraw RWA Tokens
                     </CardTitle>
                     <CardDescription className="text-[#1a2332] font-semibold">
-                      Withdraw your Carbon Credit Tokens from the vault
+                      Withdraw your RWA tokens from the vault
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -372,7 +372,7 @@ export default function VaultPage() {
                       ) : (
                         <>
                           <ArrowDownRight className="w-4 h-4 mr-2" />
-                          Withdraw CCT
+                          Withdraw Tokens
                         </>
                       )}
                     </Button>
