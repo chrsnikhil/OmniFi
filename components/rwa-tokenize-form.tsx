@@ -263,39 +263,34 @@ export function RwaTokenizeForm() {
                 const isSelected = watchedAssetType === assetType.id
                 
                 return (
-                  <motion.div
+                  <Card 
                     key={assetType.id}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    className={`cursor-pointer transition-all border-3 ${
+                      isSelected 
+                        ? 'border-[#4a90e2] shadow-[8px_8px_0px_0px_#4a90e2] bg-blue-50' 
+                        : 'border-[#1a2332] shadow-[4px_4px_0px_0px_#1a2332] hover:shadow-[8px_8px_0px_0px_#1a2332]'
+                    }`}
+                    onClick={() => handleAssetTypeSelect(assetType.id)}
                   >
-                    <Card 
-                      className={`cursor-pointer transition-all border-3 ${
-                        isSelected 
-                          ? 'border-[#4a90e2] shadow-[8px_8px_0px_0px_#4a90e2] bg-blue-50' 
-                          : 'border-[#1a2332] shadow-[4px_4px_0px_0px_#1a2332] hover:shadow-[8px_8px_0px_0px_#1a2332]'
-                      }`}
-                      onClick={() => handleAssetTypeSelect(assetType.id)}
-                    >
-                      <CardContent className="p-6">
-                        <div className="flex items-center gap-4">
-                          <div className={`p-3 rounded-lg ${assetType.color}`}>
-                            <Icon className="h-6 w-6 text-white" />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="font-black font-space-grotesk text-[#1a2332] text-lg">
-                              {assetType.name}
-                            </h3>
-                            <p className="text-sm text-[#2d3748] font-mono">
-                              {assetType.description}
-                            </p>
-                          </div>
-                          {isSelected && (
-                            <CheckCircle className="h-6 w-6 text-[#4a90e2]" />
-                          )}
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-4">
+                        <div className={`p-3 rounded-lg ${assetType.color}`}>
+                          <Icon className="h-6 w-6 text-white" />
                         </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
+                        <div className="flex-1">
+                          <h3 className="font-black font-space-grotesk text-[#1a2332] text-lg">
+                            {assetType.name}
+                          </h3>
+                          <p className="text-sm text-[#2d3748] font-mono">
+                            {assetType.description}
+                          </p>
+                        </div>
+                        {isSelected && (
+                          <CheckCircle className="h-6 w-6 text-[#4a90e2]" />
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
                 )
               })}
             </div>

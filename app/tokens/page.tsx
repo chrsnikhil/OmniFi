@@ -56,7 +56,7 @@ export default function TokensPage() {
   }, [user, authenticated, ready]);
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5] bg-[linear-gradient(#4a90e2_1px,transparent_1px),linear-gradient(90deg,#4a90e2_1px,transparent_1px)] bg-[size:20px_20px] flex items-center justify-center p-8">
+    <div className="min-h-screen bg-[#f5f5f5] bg-[linear-gradient(#4a90e2_1px,transparent_1px),linear-gradient(90deg,#4a90e2_1px,transparent_1px)] bg-[size:20px_20px] p-8">
       <div className="max-w-7xl w-full mx-auto">
         <Card className="bg-white border-4 border-[#1a2332] shadow-[12px_12px_0px_0px_#4a90e2] mb-10">
           <CardHeader>
@@ -79,7 +79,7 @@ export default function TokensPage() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-4"
           >
             {tokens.map((token, idx) => (
               <motion.div

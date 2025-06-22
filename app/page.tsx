@@ -336,16 +336,16 @@ export default function OmniFiLanding() {
       {/* Hero Section */}
       <motion.section style={{ y: heroY }} className="py-16 px-6 relative">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-auto lg:h-[800px]">
+          <div className="grid grid-cols-1 lg:grid-cols-12 lg:grid-rows-2 gap-6 items-stretch">
             {/* Main Hero Card */}
             <motion.div
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="lg:col-span-7 lg:row-span-2"
+              className="lg:col-start-1 lg:col-span-7 lg:row-span-2 flex flex-col"
             >
-              <CellShadedCard color="#4a90e2" className="h-full">
-                <CardContent className="p-8 h-full flex flex-col justify-between relative overflow-hidden">
+              <CellShadedCard color="#4a90e2" className="flex flex-col h-full">
+                <CardContent className="p-8 flex flex-col justify-between relative overflow-hidden h-full">
                   {/* Background Pattern */}
                   <div className="absolute inset-0 bg-[linear-gradient(45deg,#4a90e2_25%,transparent_25%),linear-gradient(-45deg,#4a90e2_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#4a90e2_75%),linear-gradient(-45deg,transparent_75%,#4a90e2_75%)] bg-[size:20px_20px] opacity-10" />
 
@@ -404,7 +404,7 @@ export default function OmniFiLanding() {
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                       <Button
                         variant="outline"
-                        className="bg-white border-4 border-[#1a2332] text-[#1a2332] hover:bg-[#f5f5f5] font-black font-space-grotesk px-8 py-4 text-lg rounded-none shadow-[8px_8px_0px_0px_#6c5ce7] hover:shadow-[12px_12px_0px_0px_#6c5ce7] transition-all duration-200"
+                        className="bg-white border-4 border-[#1a2332] text-[#1a2332] hover:bg-[#f5f5f5] hover:text-[#1a2332] focus:text-[#1a2332] active:text-[#1a2332] font-black font-space-grotesk px-8 py-4 text-lg rounded-none shadow-[8px_8px_0px_0px_#6c5ce7] hover:shadow-[12px_12px_0px_0px_#6c5ce7] transition-all duration-200"
                         onClick={() => router.push("/tokens")}
                       >
                         <Database className="mr-3 h-6 w-6" />
@@ -430,10 +430,10 @@ export default function OmniFiLanding() {
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="lg:col-span-5"
+              className="lg:col-start-8 lg:col-span-5 lg:row-span-1 lg:row-start-1 flex flex-col"
             >
-              <CellShadedCard color="#00b894">
-                <CardContent className="p-6 relative overflow-hidden">
+              <CellShadedCard color="#00b894" className="flex flex-col">
+                <CardContent className="p-6 flex flex-col relative overflow-hidden">
                   <div className="space-y-6">
                     <div className="flex items-center space-x-4">
                       <FloatingElement>
@@ -476,10 +476,10 @@ export default function OmniFiLanding() {
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="lg:col-span-5"
+              className="lg:col-start-8 lg:col-span-5 lg:row-span-1 lg:row-start-2 flex flex-col"
             >
-              <CellShadedCard color="#6c5ce7">
-                <CardContent className="p-6 space-y-6 bg-[#6c5ce7] text-white">
+              <CellShadedCard color="#6c5ce7" className="flex flex-col">
+                <CardContent className="p-6 space-y-6 bg-[#6c5ce7] text-white flex flex-col">
                   <div className="flex items-center space-x-4">
                     <FloatingElement>
                       <div className="w-12 h-12 bg-white border-4 border-[#1a2332] rounded-none flex items-center justify-center shadow-[4px_4px_0px_0px_#1a2332]">
@@ -903,7 +903,7 @@ export default function OmniFiLanding() {
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button
                   variant="outline"
-                  className="bg-white border-4 border-[#4a90e2] text-[#1a2332] hover:bg-[#f5f5f5] font-black font-space-grotesk px-12 py-6 text-xl rounded-none shadow-[12px_12px_0px_0px_#4a90e2] hover:shadow-[16px_16px_0px_0px_#4a90e2] transition-all duration-200"
+                  className="bg-white border-4 border-[#4a90e2] text-[#1a2332] hover:bg-[#f5f5f5] hover:text-[#1a2332] focus:text-[#1a2332] active:text-[#1a2332] font-black font-space-grotesk px-12 py-6 text-xl rounded-none shadow-[12px_12px_0px_0px_#4a90e2] hover:shadow-[16px_16px_0px_0px_#4a90e2] transition-all duration-200"
                 >
                   <Github className="h-8 w-8 mr-4" />
                   VIEW ON GITHUB
