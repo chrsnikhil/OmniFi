@@ -11,7 +11,7 @@ import { Zap, Database, Network, Bot, Shield, Rocket } from "lucide-react"
  * OMNIFI DESIGN SYSTEM STYLE GUIDE
  *
  * Use this component as a reference for creating consistent UI elements
- * that match the Sui Overflow aesthetic with OmniFi branding.
+ * that match the aesthetic with OmniFi branding.
  */
 
 export default function OmniFiStyleGuide() {

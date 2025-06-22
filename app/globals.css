@@ -32,6 +32,33 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Remove all custom Privy CSS variables to restore default Privy modal styles */
+    /*
+    --privy-border-radius-sm: 0px;
+    --privy-border-radius-md: 0px;
+    --privy-border-radius-lg: 0px;
+    --privy-border-radius-full: 0px;
+    --privy-color-background: #f5f5f5;
+    --privy-color-background-2: #fff;
+    --privy-color-background-3: #4a90e2;
+    --privy-color-foreground: #1a2332;
+    --privy-color-foreground-2: #2d3748;
+    --privy-color-foreground-3: #6c5ce7;
+    --privy-color-foreground-4: #fdcb6e;
+    --privy-color-foreground-accent: #00b894;
+    --privy-color-accent: #4a90e2;
+    --privy-color-accent-light: #6c5ce7;
+    --privy-color-accent-lightest: #e3f0fc;
+    --privy-color-accent-dark: #1a2332;
+    --privy-color-accent-darkest: #000;
+    --privy-color-success: #00b894;
+    --privy-color-error: #fd79a8;
+    --privy-color-error-light: #e3f0fc;
+    --privy-color-warning: #4a90e2;
+    --privy-color-warning-light: #e3f0fc;
+    --privy-color-warning-dark: #1a2332;
+    */
+    font-family: 'Space Grotesk', sans-serif;
   }
 }
 
@@ -305,4 +332,55 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #357abd;
+}
+
+/* Remove all custom Privy modal/button/input overrides to restore default Privy styles */
+/* (No custom Privy CSS here) */
+
+/* Custom box shadow and highlights for Privy modal in dark theme */
+.privy-modal-root, .privy-modal, [class*="privy-modal"], [class*="privy-container"] {
+  background: #1a2332 !important; /* dark navy */
+  color: #fff !important;
+  box-shadow: 12px 12px 0px 0px #4a90e2 !important;
+  border-radius: 0.75rem !important;
+  border: 4px solid #4a90e2 !important;
+}
+
+/* Modal inner card (if any) */
+[class*="privy-card"], [class*="privy-content"] {
+  background: #232c3d !important;
+  color: #fff !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 8px 8px 0px 0px #4a90e2 !important;
+  border: 2px solid #4a90e2 !important;
+}
+
+/* Buttons */
+[class*="privy-button"] {
+  background: #4a90e2 !important;
+  color: #fff !important;
+  border: 2px solid #fdcb6e !important;
+  border-radius: 0.5rem !important;
+  font-weight: 700 !important;
+  box-shadow: 4px 4px 0px 0px #fdcb6e !important;
+  transition: box-shadow 0.2s, background 0.2s;
+}
+[class*="privy-button"]:hover, [class*="privy-button"].active, [class*="privy-button"]:focus {
+  background: #357abd !important;
+  box-shadow: 6px 6px 0px 0px #fdcb6e !important;
+  border-color: #fdcb6e !important;
+}
+
+/* Input fields */
+[class*="privy-input"] {
+  background: #232c3d !important;
+  color: #fff !important;
+  border: 2px solid #4a90e2 !important;
+  border-radius: 0.5rem !important;
+  font-weight: 600 !important;
+  box-shadow: 2px 2px 0px 0px #4a90e2 !important;
+}
+[class*="privy-input"]:focus {
+  border-color: #fdcb6e !important;
+  box-shadow: 4px 4px 0px 0px #fdcb6e !important;
 }
