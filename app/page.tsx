@@ -30,6 +30,7 @@ import {
 import { motion, useInView, useScroll, useTransform } from "framer-motion"
 import { useRef, useState, useEffect } from "react"
 import { usePrivy } from '@privy-io/react-auth'
+import { useRouter } from "next/navigation"
 
 // Cell-shaded animation variants
 const fadeInUp = {
@@ -322,6 +323,7 @@ export default function OmniFiLanding() {
   const [loading, setLoading] = useState(true)
   const { scrollYProgress } = useScroll()
   const heroY = useTransform(scrollYProgress, [0, 1], [0, -100])
+  const router = useRouter()
 
   if (loading) {
     return <LoadingScreen onComplete={() => setLoading(false)} />
@@ -392,6 +394,7 @@ export default function OmniFiLanding() {
                       <Button
                         size="lg"
                         className="bg-[#1a2332] hover:bg-[#2d3748] text-white font-black font-space-grotesk px-8 py-4 text-lg border-4 border-[#1a2332] rounded-none shadow-[8px_8px_0px_0px_#4a90e2] hover:shadow-[12px_12px_0px_0px_#4a90e2] transition-all duration-200"
+                        onClick={() => router.push("/tokenize")}
                       >
                         <Rocket className="mr-3 h-6 w-6" />
                         LAUNCH PROTOCOL
@@ -402,9 +405,10 @@ export default function OmniFiLanding() {
                       <Button
                         variant="outline"
                         className="bg-white border-4 border-[#1a2332] text-[#1a2332] hover:bg-[#f5f5f5] font-black font-space-grotesk px-8 py-4 text-lg rounded-none shadow-[8px_8px_0px_0px_#6c5ce7] hover:shadow-[12px_12px_0px_0px_#6c5ce7] transition-all duration-200"
+                        onClick={() => router.push("/tokens")}
                       >
-                        <Github className="mr-3 h-6 w-6" />
-                        VIEW DOCS
+                        <Database className="mr-3 h-6 w-6" />
+                        VIEW TOKENS
                       </Button>
                     </motion.div>
                   </div>
