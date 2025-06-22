@@ -30,12 +30,18 @@ import {
   User
 } from "lucide-react"
 import { toast } from "sonner"
+import { ethers, BrowserProvider } from "ethers"
+// @ts-ignore
+import erc20Abi from "@/lib/erc20.abi.json"
+// @ts-ignore
+import erc20Bytecode from "@/lib/erc20.bytecode.json"
 
 // Form validation schema
 const rwaFormSchema = z.object({
   assetType: z.string().min(1, "Asset type is required"),
   assetId: z.string().min(3, "Asset ID must be at least 3 characters").max(50, "Asset ID must be less than 50 characters"),
   assetName: z.string().min(2, "Asset name must be at least 2 characters").max(100, "Asset name must be less than 100 characters"),
+  assetSymbol: z.string().min(2, "Symbol must be at least 2 characters").max(10, "Symbol must be less than 10 characters"),
   value: z.number().min(0.01, "Value must be greater than 0").max(1000000, "Value must be reasonable"),
   unit: z.string().min(1, "Unit is required"),
   description: z.string().max(500, "Description must be less than 500 characters").optional(),
@@ -73,7 +79,7 @@ const assetTypes = [
     name: "Renewable Energy",
     icon: Zap,
     color: "bg-purple-500",
-    description: "Solar, wind, and clean energy assets"
+    description: "Clean energy assets"
   }
 ]
 
@@ -81,6 +87,7 @@ export function RwaTokenizeForm() {
   const { ready, authenticated, login, user, logout } = usePrivy()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedAssetType, setSelectedAssetType] = useState<string>("")
+  const [deployedAddress, setDeployedAddress] = useState<string>("")
 
   const {
     register,
@@ -95,6 +102,7 @@ export function RwaTokenizeForm() {
       assetType: "",
       assetId: "",
       assetName: "",
+      assetSymbol: "",
       value: 0,
       unit: "",
       description: "",
@@ -111,26 +119,39 @@ export function RwaTokenizeForm() {
       toast.error("Please connect your wallet first")
       return
     }
-
     setIsSubmitting(true)
-    
+    setDeployedAddress("")
     try {
-      // Simulate API call - replace with actual contract interaction
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      console.log("RWA Data to tokenize:", data)
-      
-      toast.success(`Successfully submitted ${data.assetName} for tokenization!`)
-      
-      // Reset form after successful submission
-      reset()
-      setSelectedAssetType("")
-      
+      // Get the user's signer from Privy or window.ethereum
+      if (!window.ethereum) throw new Error("No wallet found");
+      const browserProvider = new BrowserProvider(window.ethereum as any);
+      const signer = await browserProvider.getSigner();
+      // Prepare contract factory
+      const factory = new ethers.ContractFactory(
+        erc20Abi,
+        erc20Bytecode.bytecode,
+        signer
+      );
+      // Convert value to 18 decimals
+      const initialSupply = ethers.parseUnits(data.value.toString(), 18);
+      // Deploy contract
+      const contract = await factory.deploy(
+        data.assetName,
+        data.assetSymbol,
+        initialSupply
+      );
+      await contract.waitForDeployment();
+      // @ts-ignore
+      const address = contract.target || contract.address;
+      setDeployedAddress(address);
+      toast.success(`Token deployed at: ${address}`);
+      reset();
+      setSelectedAssetType("");
     } catch (error) {
-      console.error("Error tokenizing RWA:", error)
-      toast.error("Failed to tokenize asset. Please try again.")
+      console.error("Error deploying token:", error);
+      toast.error("Failed to deploy token. Please try again.");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
   }
 
@@ -323,6 +344,25 @@ export function RwaTokenizeForm() {
                 )}
               </div>
 
+              {/* Asset Symbol */}
+              <div className="space-y-2">
+                <Label htmlFor="assetSymbol" className="text-lg font-black font-space-grotesk text-[#1a2332]">
+                  ASSET SYMBOL *
+                </Label>
+                <Input
+                  id="assetSymbol"
+                  {...register("assetSymbol")}
+                  placeholder="e.g., GLD, CO2, RWA"
+                  className="bg-white border-4 border-[#4a90e2] text-[#1a2332] placeholder:text-gray-500 font-bold font-space-grotesk shadow-[4px_4px_0px_0px_#4a90e2] focus:shadow-[6px_6px_0px_0px_#4a90e2] transition-all"
+                />
+                {errors.assetSymbol && (
+                  <div className="flex items-center gap-2 text-red-600">
+                    <AlertCircle className="h-4 w-4" />
+                    <span className="text-sm font-mono font-bold">{errors.assetSymbol.message}</span>
+                  </div>
+                )}
+              </div>
+
               {/* Value */}
               <div className="space-y-2">
                 <Label htmlFor="value" className="text-lg font-black font-space-grotesk text-[#1a2332]">
@@ -446,6 +486,11 @@ export function RwaTokenizeForm() {
                 <p className="text-center text-sm text-[#2d3748] font-mono font-bold mt-3">
                   Please connect your wallet to tokenize assets
                 </p>
+              )}
+              {deployedAddress && (
+                <div className="mt-4 text-center">
+                  <span className="font-mono font-bold text-green-600">Token deployed at: {deployedAddress}</span>
+                </div>
               )}
             </div>
           </form>
