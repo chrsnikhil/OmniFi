@@ -12,6 +12,8 @@ import { Badge } from '@/components/ui/badge';
 import { AlertCircle, Wallet, TrendingUp, Coins, ArrowUpRight, ArrowDownRight, RefreshCw } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
+import { motion } from "framer-motion";
+import { Rocket } from "lucide-react";
 
 export default function VaultPage() {
   const { login, logout, authenticated, user } = usePrivy();
@@ -82,17 +84,36 @@ export default function VaultPage() {
     <div className="min-h-screen bg-[#f5f5f5] bg-[linear-gradient(#4a90e2_1px,transparent_1px),linear-gradient(90deg,#4a90e2_1px,transparent_1px)] bg-[size:20px_20px] p-8">
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
-        <div className="text-center space-y-4">
-          <h1 className="text-6xl font-black text-[#1a2332] tracking-tight">
-            OMNI<span className="text-[#4a90e2]">FI</span> VAULT
-          </h1>
-          <p className="text-xl text-[#1a2332] font-bold">
+        <motion.div
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className="text-center mb-12"
+        >
+          <div className="flex flex-col items-center justify-center mb-4">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, ease: 'linear' }}
+              className="w-16 h-16 bg-[#4a90e2] border-4 border-[#1a2332] rounded-none flex items-center justify-center shadow-[8px_8px_0px_0px_#1a2332] mb-2"
+            >
+              <Rocket className="w-10 h-10 text-white" />
+            </motion.div>
+            <h1 className="text-6xl font-black text-[#1a2332] font-space-grotesk tracking-wider">
+              OMNI<span className="text-[#4a90e2]">FI</span> <span className="text-[#1a2332]">VAULT</span>
+            </h1>
+          </div>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+            className="text-xl text-[#2d3748] font-mono font-bold"
+          >
             Real-World Asset Token Vault with Dynamic Limits
-          </p>
-          <Badge variant="outline" className="border-2 border-[#4a90e2] text-[#4a90e2] font-bold px-4 py-2">
+          </motion.p>
+          <Badge variant="outline" className="border-2 border-[#4a90e2] text-[#4a90e2] font-bold px-4 py-2 mt-4">
             Powered by Chainlink Data Feeds
           </Badge>
-        </div>
+        </motion.div>
 
         {/* Connection Status */}
         {!authenticated ? (
