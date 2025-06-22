@@ -1,0 +1,24 @@
+{
+  "network": "fuji",
+  "chainId": 43113,
+  "deployer": "0x3aC23Fc97c9BED195A1CA74B593eDBf6d5688EaF",
+  "contracts": {
+    "CustomERC20": {
+      "address": "0x7d7F800b904Fe779ED75b2F97520f2E0B2d0d862",
+      "name": "Carbon Credit Token",
+      "symbol": "CCT",
+      "initialSupply": "1000000000000000000000000"
+    },
+    "Vault": {
+      "address": "0x4c09df45e969aB918739C500E3B402ceB5C739c8",
+      "depositToken": "0x7d7F800b904Fe779ED75b2F97520f2E0B2d0d862",
+      "priceFeed": "0x86d67c3D38D2bCeE722E601025C25a575021c6EA",
+      "owner": "0x3aC23Fc97c9BED195A1CA74B593eDBf6d5688EaF"
+    }
+  },
+  "timestamp": "2025-06-22T17:13:38.048Z",
+  "txHashes": {
+    "token": "0x2aa8b681ba2e37022eba7dda0f69eefcac3bc0768d208788528f81aa548fd0c9",
+    "vault": "0xc0570d1c77edfd5072708a265b7fd101cdf6b51f5360256d7a70d0ba58f04581"
+  }
+}

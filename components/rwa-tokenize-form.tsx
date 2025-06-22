@@ -152,7 +152,7 @@ export function RwaTokenizeForm() {
         address,
         name: data.assetName,
         symbol: data.assetSymbol,
-        initialSupply: data.value,
+        initialSupply: data.value.toString(),
       });
       setShowModal(true);
       toast.success("Token deployed successfully!");
