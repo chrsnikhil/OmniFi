@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import PrivyProviderWrapper from './privy-provider-wrapper'
+import { Toaster } from '@/components/ui/sonner'
 
 export const metadata: Metadata = {
   title: 'OmniFi',
@@ -14,6 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <PrivyProviderWrapper>
           {children}
+          <Toaster />
         </PrivyProviderWrapper>
       </body>
     </html>

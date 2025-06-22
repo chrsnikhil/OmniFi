@@ -166,20 +166,22 @@ function Header() {
           {/* Navigation */}
           <nav className="hidden lg:flex items-center space-x-2">
             {[
-              { name: "PROTOCOL", color: "#4a90e2" },
-              { name: "FEATURES", color: "#6c5ce7" },
-              { name: "TECH", color: "#00b894" },
-              { name: "DEMO", color: "#fdcb6e" },
+              { name: "PROTOCOL", color: "#4a90e2", href: "#protocol" },
+              { name: "FEATURES", color: "#6c5ce7", href: "#features" },
+              { name: "TECH", color: "#00b894", href: "#tech" },
+              { name: "TOKENIZE", color: "#fd79a8", href: "/tokenize" },
+              { name: "DEMO", color: "#fdcb6e", href: "#demo" },
             ].map((item) => (
-              <motion.button
+              <motion.a
                 key={item.name}
+                href={item.href}
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
                 className="px-4 py-2 bg-white border-4 border-[#1a2332] text-[#1a2332] font-black font-space-grotesk text-sm hover:bg-[#f5f5f5] transition-colors duration-200 shadow-[4px_4px_0px_0px_#4a90e2] hover:shadow-[6px_6px_0px_0px_#4a90e2]"
                 style={{ borderColor: item.color }}
               >
                 {item.name}
-              </motion.button>
+              </motion.a>
             ))}
           </nav>
 
