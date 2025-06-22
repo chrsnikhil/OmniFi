@@ -26,6 +26,7 @@ import {
   CheckCircle,
   Wallet,
   Settings,
+  Coins,
 } from "lucide-react"
 import { motion, useInView, useScroll, useTransform } from "framer-motion"
 import { useRef, useState, useEffect } from "react"
@@ -391,10 +392,13 @@ export default function OmniFiLanding() {
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                       <Button
                         size="lg"
+                        asChild
                         className="bg-[#1a2332] hover:bg-[#2d3748] text-white font-black font-space-grotesk px-8 py-4 text-lg border-4 border-[#1a2332] rounded-none shadow-[8px_8px_0px_0px_#4a90e2] hover:shadow-[12px_12px_0px_0px_#4a90e2] transition-all duration-200"
                       >
-                        <Rocket className="mr-3 h-6 w-6" />
-                        LAUNCH PROTOCOL
+                        <a href="/vault">
+                          <Rocket className="mr-3 h-6 w-6" />
+                          LAUNCH VAULT
+                        </a>
                       </Button>
                     </motion.div>
 
@@ -512,6 +516,90 @@ export default function OmniFiLanding() {
               </CellShadedCard>
             </motion.div>
           </div>
+        </div>
+      </motion.section>
+
+      {/* Vault CTA Section */}
+      <motion.section 
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.8 }}
+        className="py-12 px-6 relative"
+      >
+        <div className="max-w-4xl mx-auto">
+          <CellShadedCard color="#00b894">
+            <CardContent className="p-8 bg-[#00b894] text-white relative overflow-hidden">
+              {/* Background Pattern */}
+              <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.1)_25%,transparent_25%),linear-gradient(-45deg,rgba(255,255,255,0.1)_25%,transparent_25%),linear-gradient(45deg,transparent_75%,rgba(255,255,255,0.1)_75%),linear-gradient(-45deg,transparent_75%,rgba(255,255,255,0.1)_75%)] bg-[size:30px_30px]" />
+              
+              <div className="flex flex-col lg:flex-row items-center justify-between space-y-6 lg:space-y-0 lg:space-x-8 relative z-10">
+                <div className="flex-1 space-y-4">
+                  <div className="flex items-center space-x-4">
+                    <FloatingElement>
+                      <div className="w-16 h-16 bg-white border-4 border-[#1a2332] rounded-none flex items-center justify-center shadow-[4px_4px_0px_0px_#1a2332]">
+                        <TrendingUp className="w-8 h-8 text-[#00b894]" />
+                      </div>
+                    </FloatingElement>
+                    <div>
+                      <h3 className="text-3xl font-black font-space-grotesk text-white tracking-wider">
+                        CARBON CREDIT VAULT
+                      </h3>
+                      <p className="text-white/80 font-bold font-mono">LIVE ON AVALANCHE FUJI</p>
+                    </div>
+                  </div>
+                  
+                  <p className="text-white text-lg font-bold max-w-lg leading-relaxed font-mono">
+                    TOKENIZE REAL-WORLD ASSETS AND EARN OPTIMIZED YIELDS WITH AI-POWERED AUTOMATION AND CHAINLINK ORACLES.
+                  </p>
+                  
+                  <div className="flex items-center space-x-2 text-white/80">
+                    <Coins className="w-5 h-5" />
+                    <span className="font-mono text-sm">
+                      Need CCT tokens? <a href="/tokenize" className="underline hover:text-white transition-colors">Get them here</a>
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col space-y-4">
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button
+                      size="lg"
+                      asChild
+                      className="bg-white hover:bg-gray-100 text-[#00b894] font-black font-space-grotesk px-8 py-4 text-lg border-4 border-[#1a2332] rounded-none shadow-[8px_8px_0px_0px_#1a2332] hover:shadow-[12px_12px_0px_0px_#1a2332] transition-all duration-200"
+                    >
+                      <a href="/vault">
+                        <Database className="mr-3 h-6 w-6" />
+                        ENTER VAULT
+                      </a>
+                    </Button>
+                  </motion.div>
+                  
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      asChild
+                      className="bg-transparent border-4 border-white text-white hover:bg-white/10 font-black font-space-grotesk px-8 py-4 text-lg rounded-none shadow-[8px_8px_0px_0px_rgba(255,255,255,0.3)] hover:shadow-[12px_12px_0px_0px_rgba(255,255,255,0.3)] transition-all duration-200"
+                    >
+                      <a href="/contracts">
+                        <Shield className="mr-3 h-6 w-6" />
+                        VIEW CONTRACTS
+                      </a>
+                    </Button>
+                  </motion.div>
+                </div>
+              </div>
+
+              {/* Floating Elements */}
+              <FloatingElement delay={1} className="absolute top-4 right-8">
+                <div className="w-8 h-8 bg-[#fdcb6e] border-4 border-[#1a2332] rounded-none transform rotate-12 shadow-[2px_2px_0px_0px_#1a2332]" />
+              </FloatingElement>
+              
+              <FloatingElement delay={1.5} className="absolute bottom-4 left-8">
+                <div className="w-6 h-6 bg-[#fd79a8] border-4 border-[#1a2332] rounded-none transform -rotate-12 shadow-[2px_2px_0px_0px_#1a2332]" />
+              </FloatingElement>
+            </CardContent>
+          </CellShadedCard>
         </div>
       </motion.section>
 
@@ -633,10 +721,13 @@ export default function OmniFiLanding() {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
                 size="lg"
+                asChild
                 className="bg-[#1a2332] hover:bg-[#2d3748] text-white font-black font-space-grotesk px-12 py-6 text-xl border-4 border-[#1a2332] rounded-none shadow-[12px_12px_0px_0px_#4a90e2] hover:shadow-[16px_16px_0px_0px_#4a90e2] transition-all duration-200"
               >
-                <Rocket className="mr-4 h-8 w-8" />
-                START EARNING NOW
+                <a href="/vault">
+                  <Rocket className="mr-4 h-8 w-8" />
+                  START EARNING NOW
+                </a>
               </Button>
             </motion.div>
           </motion.div>

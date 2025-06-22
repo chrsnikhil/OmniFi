@@ -15,7 +15,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { 
@@ -27,14 +26,12 @@ import {
   CheckCircle,
   AlertCircle,
   Loader2,
-  User
+  User,
+  Database,
+  Home
 } from "lucide-react"
 import { toast } from "sonner"
-import { ethers, BrowserProvider } from "ethers"
-// @ts-ignore
-import erc20Abi from "@/lib/erc20.abi.json"
-// @ts-ignore
-import erc20Bytecode from "@/lib/erc20.bytecode.json"
+import { web3Service } from "@/lib/web3"
 
 // Form validation schema
 const rwaFormSchema = z.object({
@@ -57,29 +54,46 @@ const assetTypes = [
     id: "carbon-credit",
     name: "Carbon Credit",
     icon: Leaf,
-    color: "bg-green-500",
-    description: "Verified carbon offset certificates"
+    color: "bg-[#00b894]",
+    description: "Verified carbon offset certificates",
+    defaultUnit: "tCO2e",
+    tokenMultiplier: 1 // 1:1 ratio
   },
   {
     id: "gold",
     name: "Gold",
     icon: Coins,
-    color: "bg-yellow-500",
-    description: "Precious metal reserves"
+    color: "bg-[#fdcb6e]",
+    description: "Precious metal reserves",
+    defaultUnit: "oz",
+    tokenMultiplier: 100 // 1 oz = 100 tokens
   },
   {
     id: "real-estate",
     name: "Real Estate",
-    icon: Mountain,
-    color: "bg-blue-500",
-    description: "Property and land assets"
+    icon: Home,
+    color: "bg-[#4a90e2]",
+    description: "Property and land assets",
+    defaultUnit: "sqft",
+    tokenMultiplier: 0.1 // 1 sqft = 0.1 tokens
   },
   {
     id: "renewable-energy",
     name: "Renewable Energy",
     icon: Zap,
-    color: "bg-purple-500",
-    description: "Clean energy assets"
+    color: "bg-[#6c5ce7]",
+    description: "Clean energy generation assets",
+    defaultUnit: "kWh",
+    tokenMultiplier: 0.01 // 1 kWh = 0.01 tokens
+  },
+  {
+    id: "commodities",
+    name: "Commodities",
+    icon: Database,
+    color: "bg-[#fd79a8]",
+    description: "Agricultural & raw material assets",
+    defaultUnit: "metric tons",
+    tokenMultiplier: 10 // 1 metric ton = 10 tokens
   }
 ]
 
@@ -87,13 +101,14 @@ export function RwaTokenizeForm() {
   const { ready, authenticated, login, user, logout } = usePrivy()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedAssetType, setSelectedAssetType] = useState<string>("")
-  const [deployedAddress, setDeployedAddress] = useState<string>("")
+  const [mintedAmount, setMintedAmount] = useState<string>("")
   const [showModal, setShowModal] = useState(false)
   const [tokenDetails, setTokenDetails] = useState<{
-    address: string;
-    name: string;
-    symbol: string;
-    initialSupply: string;
+    assetType: string;
+    assetName: string;
+    value: number;
+    unit: string;
+    mintedTokens: string;
   } | null>(null)
 
   const {
@@ -120,47 +135,58 @@ export function RwaTokenizeForm() {
 
   const watchedAssetType = watch("assetType")
 
-  // Handle form submission
+  // Handle form submission - now mints CCT tokens instead of deploying new contracts
   const onSubmit = async (data: RwaFormData) => {
     if (!authenticated) {
       toast.error("Please connect your wallet first")
       return
     }
+    
     setIsSubmitting(true)
-    setDeployedAddress("")
+    setMintedAmount("")
+    
     try {
-      // Get the user's signer from Privy or window.ethereum
-      if (!window.ethereum) throw new Error("No wallet found");
-      const browserProvider = new BrowserProvider(window.ethereum as any);
-      const signer = await browserProvider.getSigner();
-      // Prepare contract factory
-      const factory = new ethers.ContractFactory(
-        erc20Abi,
-        erc20Bytecode.bytecode,
-        signer
-      );
-      // Deploy contract
-      const contract = await factory.deploy(
-        data.assetName,
-        data.assetSymbol,
-        ethers.parseUnits(data.value.toString(), 18)
-      );
-      await contract.waitForDeployment();
-      const address = contract.target as string;
-      setDeployedAddress(address);
+      // Initialize web3 service
+      await web3Service.initialize();
+      
+      // Find the selected asset type to get the multiplier
+      const selectedAsset = assetTypes.find(asset => asset.id === data.assetType);
+      if (!selectedAsset) throw new Error("Invalid asset type selected");
+      
+      // Calculate tokens to mint based on asset value and multiplier
+      const tokensToMint = (data.value * selectedAsset.tokenMultiplier).toString();
+      
+      // Validate amount (max 1000 CCT per transaction)
+      if (parseFloat(tokensToMint) > 1000) {
+        throw new Error("Asset value too high. Maximum 1000 CCT tokens can be minted per transaction.");
+      }
+      
+      if (parseFloat(tokensToMint) <= 0) {
+        throw new Error("Asset value must be greater than 0");
+      }
+      
+      // Mint CCT tokens representing the RWA
+      const tx = await web3Service.mintTokens(tokensToMint);
+      toast.success("Minting transaction submitted!");
+      
+      // Wait for transaction to be mined
+      await tx.wait();
+      
+      setMintedAmount(tokensToMint);
       setTokenDetails({
-        address,
-        name: data.assetName,
-        symbol: data.assetSymbol,
-        initialSupply: data.value.toString(),
+        assetType: selectedAsset.name,
+        assetName: data.assetName,
+        value: data.value,
+        unit: data.unit,
+        mintedTokens: tokensToMint
       });
       setShowModal(true);
-      toast.success("Token deployed successfully!");
+      toast.success(`Successfully minted ${parseFloat(tokensToMint).toFixed(2)} CCT tokens representing your ${selectedAsset.name}!`);
       reset();
       setSelectedAssetType("");
     } catch (err: any) {
-      console.error("Error deploying token:", err);
-      toast.error("Failed to deploy token. Please try again.");
+      console.error("Error minting tokens:", err);
+      toast.error(err.message || "Failed to mint tokens. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -174,20 +200,7 @@ export function RwaTokenizeForm() {
     // Auto-populate some fields based on asset type
     const assetType = assetTypes.find(type => type.id === value)
     if (assetType) {
-      switch (value) {
-        case "carbon-credit":
-          setValue("unit", "tCO2e")
-          break
-        case "gold":
-          setValue("unit", "oz")
-          break
-        case "real-estate":
-          setValue("unit", "sqft")
-          break
-        case "renewable-energy":
-          setValue("unit", "kWh")
-          break
-      }
+      setValue("unit", assetType.defaultUnit)
     }
   }
 
@@ -499,11 +512,6 @@ export function RwaTokenizeForm() {
                     Please connect your wallet to tokenize assets
                   </p>
                 )}
-                {deployedAddress && (
-                  <div className="mt-4 text-center">
-                    <span className="font-mono font-bold text-green-600">Token deployed at: {deployedAddress}</span>
-                  </div>
-                )}
               </div>
             </form>
           </CardContent>
@@ -519,35 +527,47 @@ export function RwaTokenizeForm() {
             >
               ×
             </button>
-            <h2 className="text-2xl font-black font-space-grotesk text-[#1a2332] mb-4 text-center">Token Created!</h2>
-            <div className="space-y-3">
-              <div>
-                <span className="font-bold text-[#4a90e2]">Address:</span>
-                <span className="ml-2 font-mono text-[#1a2332] break-all">{tokenDetails.address}</span>
+            <div className="text-center">
+              <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+              <h2 className="text-2xl font-black font-space-grotesk text-[#1a2332] mb-6">RWA Tokenized Successfully!</h2>
+            </div>
+            <div className="space-y-4">
+              <div className="p-4 bg-green-50 rounded-lg border-2 border-green-200">
+                <div className="text-center">
+                  <div className="text-3xl font-black font-space-grotesk text-green-600">
+                    {parseFloat(tokenDetails.mintedTokens).toFixed(2)} CCT
+                  </div>
+                  <div className="text-sm font-mono text-green-700 mt-1">
+                    Tokens Minted
+                  </div>
+                </div>
               </div>
-              <div>
-                <span className="font-bold text-[#4a90e2]">Name:</span>
-                <span className="ml-2 text-[#1a2332]">{tokenDetails.name}</span>
-              </div>
-              <div>
-                <span className="font-bold text-[#4a90e2]">Symbol:</span>
-                <span className="ml-2 text-[#1a2332]">{tokenDetails.symbol}</span>
-              </div>
-              <div>
-                <span className="font-bold text-[#4a90e2]">Initial Supply:</span>
-                <span className="ml-2 text-[#1a2332]">{tokenDetails.initialSupply}</span>
+              <div className="space-y-3">
+                <div>
+                  <span className="font-black text-[#4a90e2] font-space-grotesk">Asset Type:</span>
+                  <span className="ml-2 text-[#1a2332] font-mono">{tokenDetails.assetType}</span>
+                </div>
+                <div>
+                  <span className="font-black text-[#4a90e2] font-space-grotesk">Asset Name:</span>
+                  <span className="ml-2 text-[#1a2332] font-mono">{tokenDetails.assetName}</span>
+                </div>
+                <div>
+                  <span className="font-black text-[#4a90e2] font-space-grotesk">Value:</span>
+                  <span className="ml-2 text-[#1a2332] font-mono">{tokenDetails.value} {tokenDetails.unit}</span>
+                </div>
               </div>
             </div>
-            <a
-              href={`https://testnet.snowtrace.io/address/${tokenDetails.address}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block mt-6 text-center"
-            >
-              <Button className="bg-[#4a90e2] hover:bg-[#357abd] text-white font-black font-space-grotesk px-8 py-4 border-4 border-[#4a90e2] shadow-[8px_8px_0px_0px_#1a2332] hover:shadow-[12px_12px_0px_0px_#1a2332] transition-all w-full">
-                View on Snowtrace
+            <div className="mt-6 space-y-3">
+              <Button 
+                onClick={() => setShowModal(false)}
+                className="w-full bg-[#1a2332] hover:bg-[#2d3748] text-white font-black font-space-grotesk px-8 py-4 border-4 border-[#1a2332] shadow-[8px_8px_0px_0px_#4a90e2] hover:shadow-[12px_12px_0px_0px_#4a90e2] transition-all"
+              >
+                Continue
               </Button>
-            </a>
+              <p className="text-center text-sm text-[#2d3748] font-mono">
+                Your CCT tokens have been added to your wallet balance
+              </p>
+            </div>
           </Card>
         </div>
       )}
