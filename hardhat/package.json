@@ -1,5 +1,23 @@
 {
-  "name": "hardhat-project",
+  "name": "omnifi-hardhat",
+  "version": "1.0.0",
+  "description": "OmniFi Multi-Chain Smart Contracts",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:fuji": "hardhat run scripts/deploy-multi-chain.ts --network fuji",
+    "deploy:sepolia": "hardhat run scripts/deploy-multi-chain.ts --network sepolia",
+    "deploy:base": "hardhat run scripts/deploy-multi-chain.ts --network baseSepolia",
+    "deploy:all": "npm run deploy:fuji && npm run deploy:base",
+    "deploy:transfer-coordinator": "hardhat run scripts/deploy-transfer-coordinator.ts --network fuji",
+    "test:transfer-coordinator": "hardhat run scripts/working-test-transfer-coordinator.ts --network fuji",
+    "test:transfer-coordinator-simple": "hardhat run scripts/simple-test-transfer-coordinator.ts --network fuji",
+    "verify:deployment": "hardhat run scripts/verify-deployment.ts --network fuji",
+    "verify:fuji": "hardhat run scripts/verify-contracts.ts --network fuji",
+    "verify:sepolia": "hardhat run scripts/verify-contracts.ts --network sepolia",
+    "verify:base": "hardhat run scripts/verify-contracts.ts --network baseSepolia",
+    "verify:all": "npm run verify:fuji &&  npm run verify:base"
+  },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "hardhat": "^2.24.3"

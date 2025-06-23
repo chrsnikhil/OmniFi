@@ -1,0 +1,22 @@
+{
+  "network": "baseSepolia",
+  "networkName": "Base Sepolia",
+  "chainId": 84532,
+  "deployedAt": 1750704853176,
+  "deployer": "0x3aC23Fc97c9BED195A1CA74B593eDBf6d5688EaF",
+  "contracts": {
+    "CustomERC20": {
+      "address": "0x731A6C217B181E3c4Efd2Cb8b768863B57A3E02D",
+      "name": "Carbon Credit Token",
+      "symbol": "CCT",
+      "initialSupply": "1000000000000000000000000"
+    },
+    "Vault": {
+      "address": "0x9A5DB40e6b3aA760b1B3946d3E4d0a0e65B8b364",
+      "depositToken": "0x731A6C217B181E3c4Efd2Cb8b768863B57A3E02D",
+      "priceFeed": "0x4aDC67696bA383F43DD60A9e78F2C97Fbbfc7cb1"
+    }
+  },
+  "faucet": "https://www.coinbase.com/faucets/base-ethereum-sepolia-faucet",
+  "explorer": "BaseScan"
+}

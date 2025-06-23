@@ -1,24 +1,29 @@
 {
   "network": "fuji",
+  "networkName": "Avalanche Fuji",
   "chainId": 43113,
+  "deployedAt": 1750705761036,
   "deployer": "0x3aC23Fc97c9BED195A1CA74B593eDBf6d5688EaF",
   "contracts": {
     "CustomERC20": {
-      "address": "0x7d7F800b904Fe779ED75b2F97520f2E0B2d0d862",
+      "address": "0x4147A5E71d0C9Ea40604ecf9B6b1E15D936a21a7",
       "name": "Carbon Credit Token",
       "symbol": "CCT",
       "initialSupply": "1000000000000000000000000"
     },
     "Vault": {
-      "address": "0x4c09df45e969aB918739C500E3B402ceB5C739c8",
-      "depositToken": "0x7d7F800b904Fe779ED75b2F97520f2E0B2d0d862",
-      "priceFeed": "0x86d67c3D38D2bCeE722E601025C25a575021c6EA",
-      "owner": "0x3aC23Fc97c9BED195A1CA74B593eDBf6d5688EaF"
+      "address": "0xeF753076Ec19eD8a3F41D51eA4C97b48b8EE08bA",
+      "depositToken": "0x4147A5E71d0C9Ea40604ecf9B6b1E15D936a21a7",
+      "priceFeed": "0x86d67c3D38D2bCeE722E601025C25a575021c6EA"
+    },
+    "TransferCoordinator": {
+      "address": "0x36AFFD318f5946c3faA9FdDA1dA93E7eb9066949",
+      "carbonToken": "0x4147A5E71d0C9Ea40604ecf9B6b1E15D936a21a7",
+      "router": "0xA9d587a00A31A52Ed70D6026794a8FC5E2F5dCb0",
+      "donId": "0x66756e2d6176616c616e6368652d66756a692d31000000000000000000000000",
+      "subscriptionId": "0"
     }
   },
-  "timestamp": "2025-06-22T17:13:38.048Z",
-  "txHashes": {
-    "token": "0x2aa8b681ba2e37022eba7dda0f69eefcac3bc0768d208788528f81aa548fd0c9",
-    "vault": "0xc0570d1c77edfd5072708a265b7fd101cdf6b51f5360256d7a70d0ba58f04581"
-  }
+  "faucet": "https://core.app/tools/testnet-faucet/?subnet=c&token=c (code: avalanche-academy)",
+  "explorer": "Snowtrace"
 }
