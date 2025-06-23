@@ -1,0 +1,32 @@
+{
+  "network": "fuji",
+  "deployer": "0x3aC23Fc97c9BED195A1CA74B593eDBf6d5688EaF",
+  "timestamp": "2025-06-23T09:33:36.517Z",
+  "contracts": {
+    "carbonToken": {
+      "address": "0x00DF4aD9876682537A0612D348A9374Ec78c157C",
+      "name": "Carbon Credit Token",
+      "symbol": "CCT",
+      "initialSupply": "1000000.0"
+    },
+    "vault": {
+      "address": "0x8A65054F8c6C48A30dA97C03cA19fcb3147900Ef",
+      "carbonToken": "0x00DF4aD9876682537A0612D348A9374Ec78c157C",
+      "priceFeed": "0x86d67c3D38D2bCeE722E601025C25a575021c6EA",
+      "owner": "0x3aC23Fc97c9BED195A1CA74B593eDBf6d5688EaF",
+      "rebalanceThreshold": "500",
+      "baseDepositLimit": "100",
+      "priceThreshold": "200000000000"
+    }
+  },
+  "chainlinkAutomation": {
+    "network": "Avalanche Fuji",
+    "registrationUrl": "https://automation.chain.link/fuji",
+    "contractAddress": "0x8A65054F8c6C48A30dA97C03cA19fcb3147900Ef",
+    "checkUpkeepFunction": "checkUpkeep(bytes)",
+    "performUpkeepFunction": "performUpkeep(bytes)",
+    "minInterval": "43200",
+    "gasLimit": "500000",
+    "description": "OmniFi Vault Volatility-Based Rebalancing"
+  }
+}

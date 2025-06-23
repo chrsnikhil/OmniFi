@@ -247,6 +247,173 @@ export class Web3Service {
       totalSupply: ethers.formatEther(totalSupply)
     };
   }
+
+  // New methods for volatility and rebalancing features
+  
+  async getVolatilityInfo() {
+    try {
+      const contract = this.getReadOnlyContract('VAULT');
+      
+      // Check if the function exists by trying to call it
+      const result = await contract.getVolatilityInfo();
+      const [currentVolatility, priceCount, lastUpdate, canUpdate] = result;
+      
+      return {
+        currentVolatility: Number(currentVolatility),
+        priceCount: Number(priceCount),
+        lastUpdate: Number(lastUpdate),
+        canUpdate: Boolean(canUpdate),
+        volatilityPercentage: (Number(currentVolatility) / 100).toFixed(2) // Convert to percentage
+      };
+    } catch (error: any) {
+      console.error('Error getting volatility info:', error);
+      console.error('This might indicate the contract doesn\'t have the getVolatilityInfo function or contract needs redeployment');
+      return {
+        currentVolatility: 0,
+        priceCount: 0,
+        lastUpdate: 0,
+        canUpdate: false,
+        volatilityPercentage: '0.00'
+      };
+    }
+  }
+
+  async getRebalanceInfo() {
+    try {
+      const contract = this.getReadOnlyContract('VAULT');
+      const result = await contract.getRebalanceInfo();
+      const [threshold, lastRebalance, rebalanceCount, timeSinceLastRebalance, nextRebalanceEligible] = result;
+      
+      return {
+        threshold: Number(threshold),
+        lastRebalance: Number(lastRebalance),
+        rebalanceCount: Number(rebalanceCount),
+        timeSinceLastRebalance: Number(timeSinceLastRebalance),
+        nextRebalanceEligible: Number(nextRebalanceEligible),
+        thresholdPercentage: (Number(threshold) / 100).toFixed(2) // Convert to percentage
+      };
+    } catch (error: any) {
+      console.error('Error getting rebalance info:', error);
+      console.error('This might indicate the contract doesn\'t have the getRebalanceInfo function or contract needs redeployment');
+      return {
+        threshold: 0,
+        lastRebalance: 0,
+        rebalanceCount: 0,
+        timeSinceLastRebalance: 0,
+        nextRebalanceEligible: 0,
+        thresholdPercentage: '0.00'
+      };
+    }
+  }
+
+  async getAllocationInfo() {
+    try {
+      const contract = this.getReadOnlyContract('VAULT');
+      const [conservative, moderate, aggressive, totalAllocation] = await contract.getAllocationInfo();
+      
+      return {
+        conservative: Number(conservative),
+        moderate: Number(moderate),
+        aggressive: Number(aggressive),
+        totalAllocation: Number(totalAllocation),
+        conservativePercentage: (Number(conservative) / 100).toFixed(1),
+        moderatePercentage: (Number(moderate) / 100).toFixed(1),
+        aggressivePercentage: (Number(aggressive) / 100).toFixed(1)
+      };
+    } catch (error: any) {
+      console.error('Error getting allocation info:', error);
+      return {
+        conservative: 0,
+        moderate: 0,
+        aggressive: 0,
+        totalAllocation: 0,
+        conservativePercentage: '0.0',
+        moderatePercentage: '0.0',
+        aggressivePercentage: '0.0'
+      };
+    }
+  }
+
+  async getPriceHistory() {
+    try {
+      const contract = this.getReadOnlyContract('VAULT');
+      const [prices, timestamps] = await contract.getPriceHistory();
+      
+      return {
+        prices: prices.map((price: any) => (Number(price) / 1e8).toFixed(2)),
+        timestamps: timestamps.map((timestamp: any) => Number(timestamp)),
+        count: prices.length
+      };
+    } catch (error: any) {
+      console.error('Error getting price history:', error);
+      return {
+        prices: [],
+        timestamps: [],
+        count: 0
+      };
+    }
+  }
+
+  async checkUpkeepNeeded() {
+    try {
+      const contract = this.getReadOnlyContract('VAULT');
+      const [upkeepNeeded, performData] = await contract.checkUpkeep('0x');
+      
+      return {
+        upkeepNeeded: Boolean(upkeepNeeded),
+        performData: performData
+      };
+    } catch (error: any) {
+      console.error('Error checking upkeep:', error);
+      return {
+        upkeepNeeded: false,
+        performData: '0x'
+      };
+    }
+  }
+
+  async updateVolatilityIndex(): Promise<ethers.TransactionResponse> {
+    const contract = this.getContract('VAULT');
+    return await contract.updateVolatilityIndex();
+  }
+
+  async manualRebalance(): Promise<ethers.TransactionResponse> {
+    const contract = this.getContract('VAULT');
+    return await contract.manualRebalance();
+  }
+
+  // Enhanced vault status with new features
+  async getEnhancedVaultStatus() {
+    try {
+      const [
+        basicStatus,
+        volatilityInfo,
+        rebalanceInfo,
+        allocationInfo,
+        priceHistory,
+        upkeepStatus
+      ] = await Promise.all([
+        this.getVaultStatus(),
+        this.getVolatilityInfo(),
+        this.getRebalanceInfo(),
+        this.getAllocationInfo(),
+        this.getPriceHistory(),
+        this.checkUpkeepNeeded()
+      ]);
+
+      return {
+        ...basicStatus,
+        volatility: volatilityInfo,
+        rebalancing: rebalanceInfo,
+        allocations: allocationInfo,
+        priceHistory: priceHistory,
+        automation: upkeepStatus
+      };
+    } catch (error: any) {
+      console.error('Error getting enhanced vault status:', error);
+      return null;
+    }
+  }
 }
 
 export const web3Service = new Web3Service();
