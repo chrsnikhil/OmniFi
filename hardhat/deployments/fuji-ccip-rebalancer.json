@@ -1,0 +1,10 @@
+{
+  "network": "fuji",
+  "deployer": "0x33450c70dA7CD8815649bA02F6F7D9814F92f154",
+  "contract": {
+    "CCIPTokenRebalancer": "0x0B5b74c6Bed3deC975cEF47E5BFC9110F0816f77",
+    "ccipRouter": "0x554472a2720e5e7d5d3c817529aba05eed5f82d8"
+  },
+  "timestamp": "2025-06-23T15:09:34.009Z",
+  "txHash": "0x2ed62d5dc429d840f87dbf6f777c7fdde3720764fcad6eabbbbb75d07fcbe8cb"
+}

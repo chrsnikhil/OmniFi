@@ -469,15 +469,24 @@ contract Vault is Ownable, ReentrancyGuard, AutomationCompatibleInterface {
         if (block.timestamp >= lastPriceUpdate + VOLATILITY_UPDATE_INTERVAL) {
             updateVolatilityIndex();
         }
-        
         // Check if rebalancing conditions are met
         bool timePassed = (block.timestamp - lastRebalanceTime) >= MIN_REBALANCE_INTERVAL;
         bool volatilityHigh = volatilityIndex >= rebalanceThreshold;
         bool sufficientData = priceHistory.length >= 3;
-        
         require(timePassed && volatilityHigh && sufficientData, "Rebalancing conditions not met");
-        
         // Perform rebalancing
+        _performRebalancing();
+    }
+
+    /**
+     * @dev Owner-only emergency/manual rebalancing function
+     * Allows the owner to force a rebalance at any time, bypassing all conditions.
+     */
+    function forceRebalance() external onlyOwner {
+        // Optionally update volatility if enough time has passed
+        if (block.timestamp >= lastPriceUpdate + VOLATILITY_UPDATE_INTERVAL) {
+            updateVolatilityIndex();
+        }
         _performRebalancing();
     }
     

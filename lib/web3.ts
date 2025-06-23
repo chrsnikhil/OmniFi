@@ -110,7 +110,8 @@ export class Web3Service {
 
   async approveToken(spenderAddress: string, amount: string): Promise<ethers.TransactionResponse> {
     const contract = this.getContract('CUSTOM_ERC20');
-    const amountWei = ethers.parseEther(amount);
+    // If amount is 'max' or MaxUint256, use ethers.MaxUint256
+    const amountWei = amount === 'max' || amount === ethers.MaxUint256.toString() ? ethers.MaxUint256 : ethers.parseEther(amount);
     return await contract.approve(spenderAddress, amountWei);
   }
 
@@ -413,6 +414,24 @@ export class Web3Service {
       console.error('Error getting enhanced vault status:', error);
       return null;
     }
+  }
+
+  async forceRebalance(): Promise<any> {
+    const contract = this.getContract('VAULT');
+    return await contract.forceRebalance();
+  }
+
+  async getOwner(): Promise<string> {
+    const contract = this.getReadOnlyContract('VAULT');
+    return await contract.owner();
+  }
+
+  getSigner() {
+    return this.signer;
+  }
+
+  getProvider() {
+    return this.provider;
   }
 }
 

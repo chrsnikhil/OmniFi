@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePrivy } from '@privy-io/react-auth';
 import { useWeb3 } from '@/hooks/useWeb3';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,11 @@ import { toast } from 'sonner';
 import { motion } from "framer-motion";
 import { Rocket } from "lucide-react";
 import { PriceChart } from '@/components/price-chart';
+import { Web3Service } from '@/lib/web3';
+import Link from 'next/link';
+import { CONTRACTS } from "@/lib/contracts";
+import { web3Service } from "@/lib/web3";
+import { ethers } from "ethers";
 
 export default function VaultPage() {
   const { login, logout, authenticated, user } = usePrivy();
@@ -26,6 +31,116 @@ export default function VaultPage() {
   const [isWithdrawLoading, setIsWithdrawLoading] = useState(false);
   const [isVolatilityLoading, setIsVolatilityLoading] = useState(false);
   const [isRebalanceLoading, setIsRebalanceLoading] = useState(false);
+  const [isForceRebalanceLoading, setIsForceRebalanceLoading] = useState(false);
+  const [ownerAddress, setOwnerAddress] = useState<string | null>(null);
+  const [isOwner, setIsOwner] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [wallet, setWallet] = useState<string>("");
+  const [avaxBalance, setAvaxBalance] = useState<string>("0");
+  const [tokenBalance, setTokenBalance] = useState<string>("0");
+  const [amount, setAmount] = useState("");
+  const [receiver, setReceiver] = useState("");
+  const [chainSelector, setChainSelector] = useState("14767482510784806043");
+  const [fee, setFee] = useState<string>("");
+  const [isApproved, setIsApproved] = useState(false);
+  const [status, setStatus] = useState<string>("");
+  const [txHash, setTxHash] = useState<string>("");
+  const [messageId, setMessageId] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [destinationChain, setDestinationChain] = useState("base-sepolia");
+  const [finalRecipient, setFinalRecipient] = useState("");
+  const [showTxModal, setShowTxModal] = useState(false);
+  const [approvalTxHash, setApprovalTxHash] = useState<string>("");
+  const [showApprovalModal, setShowApprovalModal] = useState(false);
+
+  // Addresses from env/config
+  const tokenAddress = CONTRACTS.CUSTOM_ERC20.address;
+  const rebalancerAddress = process.env.NEXT_PUBLIC_CCI_PREBALANCER_ADDRESS || "";
+  const ccipReceiverBaseSepolia = process.env.NEXT_PUBLIC_CCI_RECEIVER_BASE_SEPOLIA || "";
+  const tokenBaseSepolia = process.env.NEXT_PUBLIC_CUSTOM_ERC20_BASE_SEPOLIA || "";
+
+  useEffect(() => {
+    async function fetchOwner() {
+      try {
+        const web3Service = new Web3Service();
+        const owner = await web3Service.getOwner();
+        setOwnerAddress(owner.toLowerCase());
+      } catch (e) {
+        setOwnerAddress(null);
+      }
+    }
+    fetchOwner();
+  }, []);
+
+  useEffect(() => {
+    if (user?.wallet?.address && ownerAddress) {
+      setIsOwner(user.wallet.address.toLowerCase() === ownerAddress);
+    } else {
+      setIsOwner(false);
+    }
+  }, [user?.wallet?.address, ownerAddress]);
+
+  useEffect(() => {
+    if (user && user.wallet && user.wallet.address) {
+      setIsInitialized(true);
+    }
+  }, [user]);
+
+  // Fetch wallet, balances, and allowance
+  useEffect(() => {
+    async function fetchData() {
+      await web3Service.initialize();
+      const signer = await web3Service.getSigner();
+      if (!signer) return;
+      const address = await signer.getAddress();
+      setWallet(address);
+      const provider = await web3Service.getProvider();
+      const avax = await provider?.getBalance(address);
+      setAvaxBalance(avax ? (Number(avax) / 1e18).toFixed(4) : "0");
+      const balance = await web3Service.getTokenBalance(address);
+      setTokenBalance(balance);
+      // Check allowance
+      const allowance = await web3Service.getTokenAllowance(address, rebalancerAddress);
+      setIsApproved(Number(allowance) >= Number(amount || "0"));
+    }
+    fetchData();
+  }, [amount, rebalancerAddress]);
+
+  // Estimate CCIP fee
+  useEffect(() => {
+    async function estimateFee() {
+      setFee("");
+      setStatus("");
+      if (!amount || !finalRecipient) return;
+      try {
+        const provider = await web3Service.getProvider();
+        const signer = await web3Service.getSigner();
+        if (!provider || !signer) return;
+        const rebalancerAbi = [
+          "function getRebalanceFee(uint64,address,address,uint256,uint256,bytes) view returns (uint256)"
+        ];
+        const rebalancer = new ethers.Contract(rebalancerAddress, rebalancerAbi, provider);
+        const feeVal = await rebalancer.getRebalanceFee(
+          chainSelector,
+          tokenAddress,
+          getDestinationContract(),
+          ethers.parseEther(amount),
+          500000,
+          encodeMessageData()
+        );
+        setFee(ethers.formatEther(feeVal));
+      } catch (e) {
+        setFee("");
+        setStatus("Fee estimation failed. Please check your input and try again.");
+      }
+    }
+    estimateFee();
+  }, [amount, finalRecipient, destinationChain, chainSelector, tokenAddress, rebalancerAddress]);
+
+  // Show popup when txHash is set
+  useEffect(() => {
+    if (txHash) setShowTxModal(true);
+  }, [txHash]);
 
   const handleDeposit = async () => {
     if (!depositAmount || parseFloat(depositAmount) <= 0) {
@@ -96,11 +211,124 @@ export default function VaultPage() {
       await manualRebalance();
       toast.success('Manual rebalance completed successfully!');
     } catch (error: any) {
-      toast.error(error.message || 'Manual rebalance failed');
+      // User-friendly error for rebalancing conditions
+      const isRebalanceError = error.message?.includes('Rebalancing conditions not met');
+      if (isRebalanceError) {
+        const v = vaultData?.volatility;
+        const r = vaultData?.rebalancing;
+        const unmet: string[] = [];
+        if ((v?.priceCount ?? 0) < 3) unmet.push('Not enough price history (need at least 3 points)');
+        if ((v?.currentVolatility ?? 0) / 100 < parseFloat(r?.thresholdPercentage ?? '0')) unmet.push('Volatility is below threshold');
+        // Time since last rebalance is rarely the issue, but include if needed
+        if ((r?.timeSinceLastRebalance ?? 0) < 43200) unmet.push('Not enough time since last rebalance (need 12h+)');
+        toast.error('Manual rebalance not allowed: ' + unmet.join('; '));
+      } else {
+        toast.error(error.message || 'Manual rebalance failed');
+      }
     } finally {
       setIsRebalanceLoading(false);
     }
   };
+
+  const handleForceRebalance = async () => {
+    setIsForceRebalanceLoading(true);
+    try {
+      const web3Service = new Web3Service();
+      await web3Service.forceRebalance();
+      toast.success('Force rebalance successful!');
+      await refreshData();
+    } catch (error: any) {
+      toast.error('Force rebalance failed: ' + (error.message || error));
+    } finally {
+      setIsForceRebalanceLoading(false);
+    }
+  };
+
+  // Approve token
+  async function handleApprove() {
+    setLoading(true);
+    setStatus("Approving token...");
+    try {
+      // Approve unlimited allowance
+      const tx = await web3Service.approveToken(rebalancerAddress, ethers.MaxUint256.toString());
+      setIsApproved(true);
+      setStatus("Token approved!");
+      setApprovalTxHash(tx.hash);
+      setShowApprovalModal(true);
+    } catch (e: any) {
+      setStatus(e.message || "Approval failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Helper: get destination contract address
+  function getDestinationContract() {
+    if (destinationChain === "base-sepolia") return ccipReceiverBaseSepolia;
+    // Add more chains as needed
+    return "";
+  }
+
+  // Helper: encode message data for CCIP
+  function encodeMessageData() {
+    if (!finalRecipient || !amount) return "0x";
+    return ethers.AbiCoder.defaultAbiCoder().encode([
+      "address",
+      "uint256"
+    ], [finalRecipient, ethers.parseEther(amount)]);
+  }
+
+  // Transfer tokens cross-chain
+  async function handleTransfer() {
+    setLoading(true);
+    setStatus("Transferring tokens...");
+    setTxHash("");
+    setMessageId("");
+    // Input validation
+    if (!amount || !fee || isNaN(Number(amount)) || isNaN(Number(fee))) {
+      setStatus("Please enter a valid amount and wait for fee estimation.");
+      setLoading(false);
+      return;
+    }
+    try {
+      const provider = await web3Service.getProvider();
+      const signer = await web3Service.getSigner();
+      if (!provider || !signer) throw new Error("Wallet not connected");
+      const rebalancerAbi = [
+        "function rebalanceTokens(address,uint64,address,uint256,uint256,bytes) payable returns (bytes32)",
+        "event TokensRebalanced(address indexed,address indexed,address indexed,uint256,uint64,bytes32)"
+      ];
+      const rebalancer = new ethers.Contract(rebalancerAddress, rebalancerAbi, signer);
+      const tx = await rebalancer.rebalanceTokens(
+        tokenAddress,
+        chainSelector,
+        getDestinationContract(),
+        ethers.parseEther(amount),
+        500000,
+        encodeMessageData(),
+        { value: ethers.parseEther(fee) }
+      );
+      setTxHash(tx.hash);
+      setStatus("Waiting for confirmation...");
+      const receipt = await tx.wait();
+      // Parse event for messageId
+      const event = receipt.logs
+        .map((log: any) => {
+          try {
+            return rebalancer.interface.parseLog(log);
+          } catch {
+            return null;
+          }
+        })
+        .find((e: any) => e && e.name === "TokensRebalanced");
+      if (event) setMessageId(event.args.messageId);
+      setStatus("Transfer complete!");
+    } catch (e: any) {
+      setStatus(e.message || "Transfer failed");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const formatNumber = (value: string, decimals: number = 2) => {
     const num = parseFloat(value);
@@ -194,6 +422,17 @@ export default function VaultPage() {
           </Card>
         ) : (
           <>
+            {/* AI Insights Button (only for connected users) */}
+            {isInitialized && (
+              <div className="flex justify-end mb-4">
+                <Link href="/vault/ai-insights">
+                  <Button className="bg-[#4a90e2] hover:bg-[#357abd] text-white font-black font-space-grotesk px-8 py-4 border-4 border-[#4a90e2] shadow-[8px_8px_0px_0px_#1a2332] hover:shadow-[12px_12px_0px_0px_#1a2332] transition-all flex items-center gap-2 text-lg">
+                    <span>AI Insights</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                  </Button>
+                </Link>
+              </div>
+            )}
             {/* User Info */}
             <Card className="bg-white border-4 border-[#1a2332] shadow-[12px_12px_0px_0px_#4a90e2]">
               <CardHeader>
@@ -384,6 +623,25 @@ export default function VaultPage() {
                       </>
                     )}
                   </Button>
+                  {isOwner && (
+                    <Button
+                      onClick={handleForceRebalance}
+                      disabled={isForceRebalanceLoading || vaultData.isLoading}
+                      className="w-full bg-[#e94e77] hover:bg-[#c026d3] text-white font-bold py-2 border-2 border-[#1a2332] shadow-[4px_4px_0px_0px_#1a2332] hover:shadow-[2px_2px_0px_0px_#1a2332] transition-all mt-2"
+                    >
+                      {isForceRebalanceLoading ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                          Forcing Rebalance...
+                        </>
+                      ) : (
+                        <>
+                          <Target className="w-4 h-4 mr-2" />
+                          Force Rebalance (Owner)
+                        </>
+                      )}
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -779,6 +1037,109 @@ export default function VaultPage() {
               </div>
             </div>
 
+            {/* Cross-Chain Transfer Card */}
+            <Card className="bg-white border-4 border-[#1a2332] shadow-[12px_12px_0px_0px_#4a90e2]">
+              <CardHeader>
+                <CardTitle className="text-2xl font-black font-space-grotesk text-[#1a2332] flex items-center gap-2">
+                  <Rocket className="w-6 h-6 text-[#4a90e2]" />
+                  Cross-Chain Token Transfer
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Wallet Info */}
+                <div className="flex flex-col md:flex-row md:items-center gap-4">
+                  <Badge className="bg-[#4a90e2] text-white font-bold font-space-grotesk px-3 py-1 border-2 border-[#1a2332] shadow-[2px_2px_0px_0px_#1a2332]">
+                    Wallet: {wallet ? wallet.slice(0, 6) + "..." + wallet.slice(-4) : "Not connected"}
+                  </Badge>
+                  <Badge className="bg-[#00b894] text-white font-bold font-space-grotesk px-3 py-1 border-2 border-[#1a2332] shadow-[2px_2px_0px_0px_#1a2332]">
+                    AVAX: {avaxBalance}
+                  </Badge>
+                </div>
+                {/* Token Address */}
+                <div>
+                  <div className="text-xs font-mono text-[#2d3748] mb-1">Token Address</div>
+                  <Input
+                    value={tokenAddress}
+                    readOnly
+                    className="bg-white border-4 border-[#4a90e2] text-[#1a2332] font-bold font-space-grotesk shadow-[4px_4px_0px_0px_#4a90e2]"
+                  />
+                </div>
+                {/* User Token Balance */}
+                <div className="text-sm font-mono text-[#2d3748]">Your Balance: {tokenBalance}</div>
+                {/* Amount Input */}
+                <Input
+                  placeholder="Amount"
+                  value={amount}
+                  onChange={e => setAmount(e.target.value)}
+                  className="bg-white border-4 border-[#4a90e2] text-[#1a2332] font-bold font-space-grotesk shadow-[4px_4px_0px_0px_#4a90e2] placeholder:text-[#2d3748]"
+                />
+                {/* Destination Chain Selector */}
+                <select
+                  value={destinationChain}
+                  onChange={e => setDestinationChain(e.target.value)}
+                  className="border-4 border-[#4a90e2] font-bold font-space-grotesk w-full p-2"
+                >
+                  <option value="base-sepolia">Base Sepolia</option>
+                  {/* Add more chains as needed */}
+                </select>
+                {/* Destination Contract Address (read-only) */}
+                <div>
+                  <div className="text-xs font-mono text-[#2d3748] mb-1">Destination Contract</div>
+                  <Input
+                    value={getDestinationContract()}
+                    readOnly
+                    className="bg-white border-4 border-[#4a90e2] text-[#1a2332] font-bold font-space-grotesk shadow-[4px_4px_0px_0px_#4a90e2] placeholder:text-[#2d3748]"
+                  />
+                </div>
+                {/* Final Recipient Address (on destination chain) */}
+                <Input
+                  placeholder="Recipient Address on Destination Chain"
+                  value={finalRecipient}
+                  onChange={e => setFinalRecipient(e.target.value)}
+                  className="bg-white border-4 border-[#4a90e2] text-[#1a2332] font-bold font-space-grotesk shadow-[4px_4px_0px_0px_#4a90e2] placeholder:text-[#2d3748]"
+                />
+                {/* Fee Estimate */}
+                <div className="text-sm font-mono text-[#4a90e2]">Estimated Fee: {fee ? `${fee} AVAX` : "-"}</div>
+                {/* Approve & Transfer Buttons */}
+                {!isApproved ? (
+                  <Button
+                    onClick={handleApprove}
+                    className="bg-[#1a2332] text-white font-black font-space-grotesk px-8 py-4 border-4 border-[#1a2332] shadow-[8px_8px_0px_0px_#4a90e2] hover:shadow-[12px_12px_0px_0px_#4a90e2] transition-all"
+                    disabled={loading}
+                  >
+                    <Zap className="mr-2 h-5 w-5" /> Approve
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleTransfer}
+                    className="bg-[#4a90e2] text-white font-black font-space-grotesk px-8 py-4 border-4 border-[#4a90e2] shadow-[8px_8px_0px_0px_#1a2332] hover:shadow-[12px_12px_0px_0px_#1a2332] transition-all"
+                    disabled={loading || !amount || !fee || isNaN(Number(amount)) || isNaN(Number(fee))}
+                  >
+                    <Rocket className="mr-2 h-5 w-5" /> Transfer
+                  </Button>
+                )}
+                {/* Status/Progress */}
+                {status && (
+                  <motion.div
+                    animate={{ opacity: [0, 1, 1, 0], y: [10, 0, 0, 10] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="text-sm font-mono text-[#00b894] mt-2"
+                  >
+                    {status}
+                  </motion.div>
+                )}
+                {/* Transaction Hash & Message ID */}
+                {txHash && (
+                  <div className="text-xs font-mono text-[#2d3748] mt-2">
+                    Tx: <a href={`https://testnet.snowtrace.io/tx/${txHash}`} target="_blank" rel="noopener noreferrer" className="underline">{txHash.slice(0, 10)}...</a>
+                  </div>
+                )}
+                {messageId && (
+                  <div className="text-xs font-mono text-[#4a90e2] mt-1">CCIP Message ID: {messageId}</div>
+                )}
+              </CardContent>
+            </Card>
+
             {/* How Volatility-Based Rebalancing Works */}
             <Card className="bg-white border-4 border-[#1a2332] shadow-[12px_12px_0px_0px_#4a90e2]">
               <CardHeader>
@@ -792,7 +1153,7 @@ export default function VaultPage() {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
                   <div className="space-y-2">
-                    <div className="text-4xl">�</div>
+                    <div className="text-4xl">🔍</div>
                     <h3 className="font-black text-[#1a2332]">Price Monitoring</h3>
                     <p className="text-sm text-[#1a2332] font-semibold">
                       Chainlink Data Feeds track ETH/USD price changes continuously
@@ -845,6 +1206,80 @@ export default function VaultPage() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Transaction Success Modal */}
+            {showTxModal && txHash && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                <Card className="relative w-full max-w-md bg-white border-4 border-[#1a2332] shadow-[12px_12px_0px_0px_#4a90e2] rounded-xl p-8 animate-fade-in">
+                  <button
+                    className="absolute top-4 right-4 text-[#4a90e2] font-black text-2xl hover:text-[#1a2332] transition-all"
+                    onClick={() => setShowTxModal(false)}
+                    aria-label="Close"
+                  >
+                    ×
+                  </button>
+                  <div className="text-center">
+                    <Rocket className="h-16 w-16 text-[#4a90e2] mx-auto mb-4" />
+                    <h2 className="text-2xl font-black font-space-grotesk text-[#1a2332] mb-6">Transfer Submitted!</h2>
+                    <div className="p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
+                      <div className="text-center">
+                        <div className="text-3xl font-black font-space-grotesk text-blue-600">
+                          Transaction Sent
+                        </div>
+                        <div className="text-sm font-mono text-blue-700 mt-1">
+                          <a href={`https://testnet.snowtrace.io/tx/${txHash}`} target="_blank" rel="noopener noreferrer" className="underline">View on Snowtrace</a>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-6 space-y-3">
+                      <Button 
+                        onClick={() => setShowTxModal(false)}
+                        className="w-full bg-[#1a2332] hover:bg-[#2d3748] text-white font-black font-space-grotesk px-8 py-4 border-4 border-[#1a2332] shadow-[8px_8px_0px_0px_#4a90e2] hover:shadow-[12px_12px_0px_0px_#4a90e2] transition-all"
+                      >
+                        Close
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            )}
+
+            {/* Approval Success Modal */}
+            {showApprovalModal && approvalTxHash && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                <Card className="relative w-full max-w-md bg-white border-4 border-[#1a2332] shadow-[12px_12px_0px_0px_#4a90e2] rounded-xl p-8 animate-fade-in">
+                  <button
+                    className="absolute top-4 right-4 text-[#4a90e2] font-black text-2xl hover:text-[#1a2332] transition-all"
+                    onClick={() => setShowApprovalModal(false)}
+                    aria-label="Close"
+                  >
+                    ×
+                  </button>
+                  <div className="text-center">
+                    <Zap className="h-16 w-16 text-[#4a90e2] mx-auto mb-4" />
+                    <h2 className="text-2xl font-black font-space-grotesk text-[#1a2332] mb-6">Approval Submitted!</h2>
+                    <div className="p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
+                      <div className="text-center">
+                        <div className="text-3xl font-black font-space-grotesk text-blue-600">
+                          Approval Transaction Sent
+                        </div>
+                        <div className="text-sm font-mono text-blue-700 mt-1">
+                          <a href={`https://testnet.snowtrace.io/tx/${approvalTxHash}`} target="_blank" rel="noopener noreferrer" className="underline">View on Snowtrace</a>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-6 space-y-3">
+                      <Button 
+                        onClick={() => setShowApprovalModal(false)}
+                        className="w-full bg-[#1a2332] hover:bg-[#2d3748] text-white font-black font-space-grotesk px-8 py-4 border-4 border-[#1a2332] shadow-[8px_8px_0px_0px_#4a90e2] hover:shadow-[12px_12px_0px_0px_#4a90e2] transition-all"
+                      >
+                        Close
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            )}
           </>
         )}
       </div>

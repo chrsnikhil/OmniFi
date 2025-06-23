@@ -1,0 +1,16 @@
+{
+  "network": "base-sepolia",
+  "deployer": "0x33450c70dA7CD8815649bA02F6F7D9814F92f154",
+  "contracts": {
+    "CustomERC20": "0xc898c8156A52CF3ef885AbE9bCfCdf588440C01D",
+    "CCIPTokenReceiver": "0xE5D3424Fc52a122F6621489840f7573076f26F29",
+    "ccipRouter": "0x88E492127709447A5ABEFdaB8788a15B4567589E",
+    "trustedSender": "0x0B5b74c6Bed3deC975cEF47E5BFC9110F0816f77",
+    "trustedSourceChainSelector": "43113"
+  },
+  "timestamp": "2025-06-23T15:44:58.335Z",
+  "txHashes": {
+    "token": "0x733d7419f2e9774e2175eb62968599d1ebaf16f0c617a8d05ab7b8f506569061",
+    "receiver": "0xed7ce8fb0f0602a48d19a9fa201d5c4032f99067af38e55013c9304b7f4aab01"
+  }
+}
