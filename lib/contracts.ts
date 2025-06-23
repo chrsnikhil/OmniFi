@@ -21,6 +21,7 @@ export const CONTRACTS = {
   VAULT: {
     address: process.env.NEXT_PUBLIC_VAULT_ADDRESS || "",
     abi: [
+      // Basic vault functions
       "function deposit(uint256) external",
       "function withdraw(uint256) external", 
       "function getUserInfo(address) view returns (uint256, uint256, uint256)",
@@ -31,8 +32,36 @@ export const CONTRACTS = {
       "function totalDeposits() view returns (uint256)",
       "function baseDepositLimit() view returns (uint256)",
       "function priceThreshold() view returns (uint256)",
+      
+      // Volatility tracking functions
+      "function getVolatilityInfo() view returns (uint256, uint256, uint256, bool)",
+      "function updateVolatilityIndex() external",
+      "function getPriceHistory() view returns (int256[], uint256[])",
+      
+      // Rebalancing functions
+      "function getRebalanceInfo() view returns (uint256, uint256, uint256, uint256, uint256)",
+      "function manualRebalance() external",
+      "function rebalance() external",
+      
+      // Allocation functions
+      "function getAllocationInfo() view returns (uint256, uint256, uint256, uint256)",
+      
+      // Chainlink Automation functions
+      "function checkUpkeep(bytes) view returns (bool, bytes)",
+      "function performUpkeep(bytes) external",
+      
+      // Owner functions
+      "function setVolatilityThreshold(uint256) external",
+      "function setRebalanceCooldown(uint256) external",
+      "function setMaxPriceHistory(uint256) external",
+      
+      // Events
       "event Deposit(address indexed, uint256, uint256)",
-      "event Withdrawal(address indexed, uint256, uint256)"
+      "event Withdrawal(address indexed, uint256, uint256)",
+      "event VolatilityUpdated(uint256 indexed, uint256)",
+      "event RebalanceTriggered(uint256 indexed, uint256, uint256, uint256)",
+      "event AllocationUpdated(uint256, uint256, uint256)",
+      "event PriceRecorded(int256 indexed, uint256)"
     ]
   }
 };

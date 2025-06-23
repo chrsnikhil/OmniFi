@@ -13,6 +13,40 @@ export interface VaultData {
   totalVaultDeposits: string;
   isLoading: boolean;
   error: string | null;
+  // New volatility and rebalancing data
+  volatility?: {
+    currentVolatility: number;
+    priceCount: number;
+    lastUpdate: number;
+    canUpdate: boolean;
+    volatilityPercentage: string;
+  };
+  rebalancing?: {
+    threshold: number;
+    lastRebalance: number;
+    rebalanceCount: number;
+    timeSinceLastRebalance: number;
+    nextRebalanceEligible: number;
+    thresholdPercentage: string;
+  };
+  allocations?: {
+    conservative: number;
+    moderate: number;
+    aggressive: number;
+    totalAllocation: number;
+    conservativePercentage: string;
+    moderatePercentage: string;
+    aggressivePercentage: string;
+  };
+  priceHistory?: {
+    prices: string[];
+    timestamps: number[];
+    count: number;
+  };
+  automation?: {
+    upkeepNeeded: boolean;
+    performData: string;
+  };
 }
 
 export function useWeb3() {
@@ -61,21 +95,40 @@ export function useWeb3() {
 
     try {
       console.log(user.wallet.address);
-      const [tokenBalance, userVaultInfo, vaultStatus] = await Promise.all([
+      const [tokenBalance, userVaultInfo, enhancedVaultStatus] = await Promise.all([
         web3Service.getTokenBalance(user.wallet.address),
         web3Service.getUserVaultInfo(user.wallet.address),
-        web3Service.getVaultStatus(),
+        web3Service.getEnhancedVaultStatus(),
       ]);
 
-      setVaultData({
-        userTokenBalance: tokenBalance,
-        userVaultDeposits: userVaultInfo.depositAmount,
-        availableDepositLimit: userVaultInfo.availableLimit,
-        currentPrice: vaultStatus.currentPrice,
-        totalVaultDeposits: vaultStatus.totalDeposits,
-        isLoading: false,
-        error: null,
-      });
+      if (enhancedVaultStatus) {
+        setVaultData({
+          userTokenBalance: tokenBalance,
+          userVaultDeposits: userVaultInfo.depositAmount,
+          availableDepositLimit: userVaultInfo.availableLimit,
+          currentPrice: enhancedVaultStatus.currentPrice,
+          totalVaultDeposits: enhancedVaultStatus.totalDeposits,
+          volatility: enhancedVaultStatus.volatility,
+          rebalancing: enhancedVaultStatus.rebalancing,
+          allocations: enhancedVaultStatus.allocations,
+          priceHistory: enhancedVaultStatus.priceHistory,
+          automation: enhancedVaultStatus.automation,
+          isLoading: false,
+          error: null,
+        });
+      } else {
+        // Fallback to basic data if enhanced status fails
+        const vaultStatus = await web3Service.getVaultStatus();
+        setVaultData({
+          userTokenBalance: tokenBalance,
+          userVaultDeposits: userVaultInfo.depositAmount,
+          availableDepositLimit: userVaultInfo.availableLimit,
+          currentPrice: vaultStatus.currentPrice,
+          totalVaultDeposits: vaultStatus.totalDeposits,
+          isLoading: false,
+          error: null,
+        });
+      }
     } catch (error: any) {
       console.error('Failed to load vault data:', error);
       setVaultData(prev => ({
@@ -143,6 +196,46 @@ export function useWeb3() {
     }
   }, [authenticated, user?.wallet?.address, isInitialized, loadVaultData]);
 
+  const updateVolatility = useCallback(async (): Promise<boolean> => {
+    if (!authenticated || !user?.wallet?.address || !isInitialized) {
+      throw new Error('Wallet not connected');
+    }
+
+    try {
+      console.log('Updating volatility index...');
+      const updateTx = await web3Service.updateVolatilityIndex();
+      await updateTx.wait();
+      console.log('Volatility update successful');
+
+      // Reload data
+      await loadVaultData();
+      return true;
+    } catch (error: any) {
+      console.error('Volatility update failed:', error);
+      throw new Error(error.message || 'Volatility update failed');
+    }
+  }, [authenticated, user?.wallet?.address, isInitialized, loadVaultData]);
+
+  const manualRebalance = useCallback(async (): Promise<boolean> => {
+    if (!authenticated || !user?.wallet?.address || !isInitialized) {
+      throw new Error('Wallet not connected');
+    }
+
+    try {
+      console.log('Performing manual rebalance...');
+      const rebalanceTx = await web3Service.manualRebalance();
+      await rebalanceTx.wait();
+      console.log('Manual rebalance successful');
+
+      // Reload data
+      await loadVaultData();
+      return true;
+    } catch (error: any) {
+      console.error('Manual rebalance failed:', error);
+      throw new Error(error.message || 'Manual rebalance failed');
+    }
+  }, [authenticated, user?.wallet?.address, isInitialized, loadVaultData]);
+
   useEffect(() => {
     initialize();
   }, [initialize]);
@@ -159,6 +252,8 @@ export function useWeb3() {
     userAddress: user?.wallet?.address,
     deposit,
     withdraw,
+    updateVolatility,
+    manualRebalance,
     refreshData: loadVaultData,
   };
 }
