@@ -15,6 +15,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
 import { motion } from "framer-motion";
 import { Rocket } from "lucide-react";
+import { PriceChart } from '@/components/price-chart';
 
 export default function VaultPage() {
   const { login, logout, authenticated, user } = usePrivy();
@@ -385,6 +386,14 @@ export default function VaultPage() {
                   </Button>
                 </CardContent>
               </Card>
+            </div>
+
+            {/* Price Trend Chart */}
+            <div className="mb-8">
+              <PriceChart 
+                priceHistory={vaultData.priceHistory || { prices: [], timestamps: [], count: 0 }}
+                currentPrice={vaultData.currentPrice}
+              />
             </div>
 
             {/* Asset Allocation Dashboard */}

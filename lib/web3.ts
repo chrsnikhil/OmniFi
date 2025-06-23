@@ -253,7 +253,10 @@ export class Web3Service {
   async getVolatilityInfo() {
     try {
       const contract = this.getReadOnlyContract('VAULT');
-      const [currentVolatility, priceCount, lastUpdate, canUpdate] = await contract.getVolatilityInfo();
+      
+      // Check if the function exists by trying to call it
+      const result = await contract.getVolatilityInfo();
+      const [currentVolatility, priceCount, lastUpdate, canUpdate] = result;
       
       return {
         currentVolatility: Number(currentVolatility),
@@ -264,6 +267,7 @@ export class Web3Service {
       };
     } catch (error: any) {
       console.error('Error getting volatility info:', error);
+      console.error('This might indicate the contract doesn\'t have the getVolatilityInfo function or contract needs redeployment');
       return {
         currentVolatility: 0,
         priceCount: 0,
@@ -277,7 +281,8 @@ export class Web3Service {
   async getRebalanceInfo() {
     try {
       const contract = this.getReadOnlyContract('VAULT');
-      const [threshold, lastRebalance, rebalanceCount, timeSinceLastRebalance, nextRebalanceEligible] = await contract.getRebalanceInfo();
+      const result = await contract.getRebalanceInfo();
+      const [threshold, lastRebalance, rebalanceCount, timeSinceLastRebalance, nextRebalanceEligible] = result;
       
       return {
         threshold: Number(threshold),
@@ -289,6 +294,7 @@ export class Web3Service {
       };
     } catch (error: any) {
       console.error('Error getting rebalance info:', error);
+      console.error('This might indicate the contract doesn\'t have the getRebalanceInfo function or contract needs redeployment');
       return {
         threshold: 0,
         lastRebalance: 0,
