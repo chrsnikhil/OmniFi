@@ -27,6 +27,7 @@ import {
   Wallet,
   Settings,
   Coins,
+  RefreshCw,
 } from "lucide-react"
 import { motion, useInView, useScroll, useTransform } from "framer-motion"
 import { useRef, useState, useEffect } from "react"
@@ -343,9 +344,9 @@ export default function OmniFiLanding() {
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="lg:col-span-7 lg:row-span-2"
+              className="lg:col-span-7 h-full flex flex-col"
             >
-              <CellShadedCard color="#4a90e2" className="h-full">
+              <CellShadedCard color="#4a90e2" className="h-full flex flex-col">
                 <CardContent className="p-8 h-full flex flex-col justify-between relative overflow-hidden">
                   {/* Background Pattern */}
                   <div className="absolute inset-0 bg-[linear-gradient(45deg,#4a90e2_25%,transparent_25%),linear-gradient(-45deg,#4a90e2_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#4a90e2_75%),linear-gradient(-45deg,transparent_75%,#4a90e2_75%)] bg-[size:20px_20px] opacity-10" />
@@ -429,96 +430,98 @@ export default function OmniFiLanding() {
               </CellShadedCard>
             </motion.div>
 
-            {/* Stats Card */}
-            <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="lg:col-span-5"
-            >
-              <CellShadedCard color="#00b894">
-                <CardContent className="p-6 relative overflow-hidden">
-                  <div className="space-y-6">
+            {/* Right Column: Protocol Stats + Key Features */}
+            <div className="lg:col-span-5 h-full flex flex-col">
+              {/* Protocol Stats Card */}
+              <motion.div
+                initial={{ opacity: 0, x: 40 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
+                <CellShadedCard color="#00b894">
+                  <CardContent className="p-6 relative overflow-hidden">
+                    <div className="space-y-6">
+                      <div className="flex items-center space-x-4">
+                        <FloatingElement>
+                          <div className="w-12 h-12 bg-[#00b894] border-4 border-[#1a2332] rounded-none flex items-center justify-center shadow-[4px_4px_0px_0px_#1a2332]">
+                            <BarChart3 className="w-6 h-6 text-white" />
+                          </div>
+                        </FloatingElement>
+                        <h3 className="text-[#1a2332] font-black text-xl font-space-grotesk tracking-wider">
+                          PROTOCOL STATS
+                        </h3>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        {[
+                          { label: "TVL", value: "$50.2M", color: "#00b894" },
+                          { label: "USERS", value: "10K+", color: "#4a90e2" },
+                          { label: "CHAINS", value: "12", color: "#6c5ce7" },
+                          { label: "APY", value: "24.5%", color: "#fdcb6e" },
+                        ].map((stat, i) => (
+                          <motion.div
+                            key={stat.label}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.6 + i * 0.1 }}
+                            className="text-center p-4 bg-white border-4 border-[#1a2332] rounded-none shadow-[4px_4px_0px_0px_var(--stat-color)]"
+                            style={{ "--stat-color": stat.color } as React.CSSProperties}
+                          >
+                            <p className="text-2xl font-black text-[#1a2332] font-space-grotesk">{stat.value}</p>
+                            <p className="text-[#2d3748] text-sm font-bold font-mono">{stat.label}</p>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </CellShadedCard>
+              </motion.div>
+
+              {/* Key Features Card (flex-grow to bottom align) */}
+              <motion.div
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.6 }}
+                className="flex-1 flex flex-col justify-end mt-6"
+              >
+                <CellShadedCard color="#6c5ce7" className="h-full flex flex-col">
+                  <CardContent className="p-6 space-y-6 bg-[#6c5ce7] text-white flex flex-col justify-between h-full">
                     <div className="flex items-center space-x-4">
                       <FloatingElement>
-                        <div className="w-12 h-12 bg-[#00b894] border-4 border-[#1a2332] rounded-none flex items-center justify-center shadow-[4px_4px_0px_0px_#1a2332]">
-                          <BarChart3 className="w-6 h-6 text-white" />
+                        <div className="w-12 h-12 bg-white border-4 border-[#1a2332] rounded-none flex items-center justify-center shadow-[4px_4px_0px_0px_#1a2332]">
+                          <Sparkles className="w-6 h-6 text-[#6c5ce7]" />
                         </div>
                       </FloatingElement>
-                      <h3 className="text-[#1a2332] font-black text-xl font-space-grotesk tracking-wider">
-                        PROTOCOL STATS
-                      </h3>
+                      <h3 className="text-white font-black text-xl font-space-grotesk tracking-wider">KEY FEATURES</h3>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-4">
                       {[
-                        { label: "TVL", value: "$50.2M", color: "#00b894" },
-                        { label: "USERS", value: "10K+", color: "#4a90e2" },
-                        { label: "CHAINS", value: "12", color: "#6c5ce7" },
-                        { label: "APY", value: "24.5%", color: "#fdcb6e" },
-                      ].map((stat, i) => (
+                        { icon: Database, text: "RWA INTEGRATION", color: "#fdcb6e" },
+                        { icon: Bot, text: "AI OPTIMIZATION", color: "#00b894" },
+                        { icon: Shield, text: "MULTI-CHAIN SECURITY", color: "#fd79a8" },
+                      ].map((item, i) => (
                         <motion.div
-                          key={stat.label}
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.6 + i * 0.1 }}
-                          className="text-center p-4 bg-white border-4 border-[#1a2332] rounded-none shadow-[4px_4px_0px_0px_var(--stat-color)]"
-                          style={{ "--stat-color": stat.color } as React.CSSProperties}
+                          key={i}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.8 + i * 0.1 }}
+                          className="flex items-center space-x-4"
                         >
-                          <p className="text-2xl font-black text-[#1a2332] font-space-grotesk">{stat.value}</p>
-                          <p className="text-[#2d3748] text-sm font-bold font-mono">{stat.label}</p>
+                          <div
+                            className="w-8 h-8 border-4 border-[#1a2332] rounded-none flex items-center justify-center shadow-[2px_2px_0px_0px_#1a2332]"
+                            style={{ backgroundColor: item.color }}
+                          >
+                            <item.icon className="w-4 h-4 text-[#1a2332]" />
+                          </div>
+                          <p className="text-white font-bold font-mono">{item.text}</p>
                         </motion.div>
                       ))}
                     </div>
-                  </div>
-                </CardContent>
-              </CellShadedCard>
-            </motion.div>
-
-            {/* Features Grid */}
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-              className="lg:col-span-5"
-            >
-              <CellShadedCard color="#6c5ce7">
-                <CardContent className="p-6 space-y-6 bg-[#6c5ce7] text-white">
-                  <div className="flex items-center space-x-4">
-                    <FloatingElement>
-                      <div className="w-12 h-12 bg-white border-4 border-[#1a2332] rounded-none flex items-center justify-center shadow-[4px_4px_0px_0px_#1a2332]">
-                        <Sparkles className="w-6 h-6 text-[#6c5ce7]" />
-                      </div>
-                    </FloatingElement>
-                    <h3 className="text-white font-black text-xl font-space-grotesk tracking-wider">KEY FEATURES</h3>
-                  </div>
-
-                  <div className="space-y-4">
-                    {[
-                      { icon: Database, text: "RWA INTEGRATION", color: "#fdcb6e" },
-                      { icon: Bot, text: "AI OPTIMIZATION", color: "#00b894" },
-                      { icon: Shield, text: "MULTI-CHAIN SECURITY", color: "#fd79a8" },
-                    ].map((item, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.8 + i * 0.1 }}
-                        className="flex items-center space-x-4"
-                      >
-                        <div
-                          className="w-8 h-8 border-4 border-[#1a2332] rounded-none flex items-center justify-center shadow-[2px_2px_0px_0px_#1a2332]"
-                          style={{ backgroundColor: item.color }}
-                        >
-                          <item.icon className="w-4 h-4 text-[#1a2332]" />
-                        </div>
-                        <p className="text-white font-bold font-mono">{item.text}</p>
-                      </motion.div>
-                    ))}
-                  </div>
-                </CardContent>
-              </CellShadedCard>
-            </motion.div>
+                  </CardContent>
+                </CellShadedCard>
+              </motion.div>
+            </div>
           </div>
         </div>
       </motion.section>
@@ -606,6 +609,50 @@ export default function OmniFiLanding() {
           </CellShadedCard>
         </div>
       </motion.section>
+
+      {/* Risk-Aware Rebalancing Section */}
+      <AnimatedSection className="py-16 px-6 relative">
+        <div className="max-w-4xl mx-auto">
+          <CellShadedCard color="#4a90e2">
+            <CardContent className="p-8 bg-white text-[#1a2332] relative overflow-hidden">
+              {/* Background Pattern */}
+              <div className="absolute inset-0 bg-[linear-gradient(45deg,#4a90e2_10%,transparent_10%),linear-gradient(-45deg,#4a90e2_10%,transparent_10%),linear-gradient(45deg,transparent_90%,#4a90e2_90%),linear-gradient(-45deg,transparent_90%,#4a90e2_90%)] bg-[size:30px_30px] opacity-5 pointer-events-none" />
+              <div className="relative z-10 space-y-6">
+                <div className="flex items-center space-x-4 mb-2">
+                  <FloatingElement>
+                    <div className="w-12 h-12 bg-[#4a90e2] border-4 border-[#1a2332] rounded-none flex items-center justify-center shadow-[4px_4px_0px_0px_#1a2332]">
+                      <Shield className="w-6 h-6 text-white" />
+                    </div>
+                  </FloatingElement>
+                  <h2 className="text-3xl font-black font-space-grotesk tracking-wider">RISK-AWARE REBALANCING</h2>
+                </div>
+                <p className="text-lg font-bold font-mono text-[#2d3748]">OmniFi's rebalancing is <span className="text-[#4a90e2]">"risk-aware"</span> because it doesn't just blindly move tokens around—it checks how wild the market is (using something called a <span className="text-[#6c5ce7]">volatility index</span>) to decide when to act. Volatility is like a measure of how much prices are jumping up and down. If prices are too crazy (high volatility), it's riskier to keep your tokens in certain places, so OmniFi adjusts them to protect your money.</p>
+                <div className="bg-[#f5f5f5] border-4 border-[#1a2332] shadow-[4px_4px_0px_0px_#4a90e2] p-6 rounded-none">
+                  <h3 className="text-xl font-black font-space-grotesk mb-4 flex items-center gap-2"><BarChart3 className="w-6 h-6 text-[#4a90e2]" /> What OmniFi Does:</h3>
+                  <ul className="list-none space-y-4 pl-0">
+                    <li className="flex items-start gap-3">
+                      <span className="mt-1"><Database className="w-5 h-5 text-[#6c5ce7]" /></span>
+                      <span className="font-mono text-[#2d3748] font-bold">Tracks the price of a mock carbon credit <span className="text-[#4a90e2]">(using Chainlink Data Feeds, like ETH/USD as a stand-in)</span>.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="mt-1"><Activity className="w-5 h-5 text-[#00b894]" /></span>
+                      <span className="font-mono text-[#2d3748] font-bold">Calculates a simple volatility index <span className="text-[#6c5ce7]">(how much the price has wiggled recently)</span>.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="mt-1"><RefreshCw className="w-5 h-5 text-[#fdcb6e]" /></span>
+                      <span className="font-mono text-[#2d3748] font-bold">If the market gets too volatile <span className="text-[#fdcb6e]">(e.g., price swings more than 5%)</span>, it "rebalances" by moving your tokens to a safer or better spot <span className="text-[#fd79a8]">()</span>.</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="mt-1"><Star className="w-5 h-5 text-[#4a90e2]" /></span>
+                      <span className="font-mono text-[#2d3748] font-bold">This makes OmniFi smarter than a basic vault that only chases the highest yield without considering risk.</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </CellShadedCard>
+        </div>
+      </AnimatedSection>
 
       {/* How It Works Section */}
       <AnimatedSection className="py-20 px-6 relative">

@@ -100,7 +100,7 @@ export default function VaultPage() {
             </motion.div>
             <h1 className="text-6xl font-black text-[#1a2332] font-space-grotesk tracking-wider">
               OMNI<span className="text-[#4a90e2]">FI</span> <span className="text-[#1a2332]">VAULT</span>
-            </h1>
+          </h1>
           </div>
           <motion.p
             initial={{ opacity: 0, y: 10 }}
