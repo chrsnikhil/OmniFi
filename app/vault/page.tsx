@@ -96,7 +96,24 @@ export default function VaultPage() {
       await manualRebalance();
       toast.success('Manual rebalance completed successfully!');
     } catch (error: any) {
-      toast.error(error.message || 'Manual rebalance failed');
+      console.error('Manual rebalance error:', error);
+      
+      // Provide more specific error feedback
+      if (error.message.includes('Rebalancing conditions not met')) {
+        const volatilityPct = vaultData.volatility ? (vaultData.volatility.currentVolatility / 100).toFixed(2) : '0.00';
+        const thresholdPct = vaultData.rebalancing ? (vaultData.rebalancing.threshold / 100).toFixed(2) : '5.00';
+        const priceCount = vaultData.volatility?.priceCount || 0;
+        
+        toast.error(
+          `Rebalancing conditions not met:\n` +
+          `• Volatility: ${volatilityPct}% (need ≥${thresholdPct}%)\n` +
+          `• Price history: ${priceCount} entries (need ≥3)\n` +
+          `Try updating volatility multiple times to build price history.`,
+          { duration: 8000 }
+        );
+      } else {
+        toast.error(error.message || 'Manual rebalance failed');
+      }
     } finally {
       setIsRebalanceLoading(false);
     }
@@ -296,6 +313,21 @@ export default function VaultPage() {
                       </>
                     )}
                   </Button>
+                  
+                  {(!vaultData.volatility || vaultData.volatility.priceCount < 3) && (
+                    <Alert className="border-2 border-blue-500 bg-blue-50">
+                      <AlertCircle className="h-4 w-4 text-blue-600" />
+                      <AlertDescription className="text-blue-800 font-semibold text-sm">
+                        <div className="space-y-1">
+                          <div className="font-bold">To demonstrate rebalancing:</div>
+                          <div>1. Update volatility multiple times (every hour)</div>
+                          <div>2. This builds price history (need ≥3 entries)</div>
+                          <div>3. Price variance creates volatility ≥5%</div>
+                          <div>4. Then manual rebalance becomes available</div>
+                        </div>
+                      </AlertDescription>
+                    </Alert>
+                  )}
                 </CardContent>
               </Card>
 
@@ -545,7 +577,37 @@ export default function VaultPage() {
                       <Alert className="border-2 border-[#e94e77] bg-pink-50">
                         <AlertCircle className="h-4 w-4 text-[#e94e77]" />
                         <AlertDescription className="text-[#1a2332] font-semibold">
-                          Rebalancing is triggered automatically when volatility exceeds {vaultData.rebalancing.thresholdPercentage}% using Chainlink Automation.
+                          <div className="space-y-2">
+                            <div>Rebalancing is triggered automatically when volatility exceeds {vaultData.rebalancing.thresholdPercentage}% using Chainlink Automation.</div>
+                            <div className="mt-3 text-sm">
+                              <div className="font-bold mb-2">Current Conditions:</div>
+                              <div className="space-y-1">
+                                <div className="flex justify-between">
+                                  <span>✅ Time passed (≥12h):</span>
+                                  <span className="text-green-600">Met</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span>{vaultData.volatility && vaultData.volatility.currentVolatility >= vaultData.rebalancing.threshold ? '✅' : '❌'} High volatility:</span>
+                                  <span className={vaultData.volatility && vaultData.volatility.currentVolatility >= vaultData.rebalancing.threshold ? 'text-green-600' : 'text-red-600'}>
+                                    {vaultData.volatility ? (vaultData.volatility.currentVolatility / 100).toFixed(2) : '0.00'}% / {vaultData.rebalancing.thresholdPercentage}%
+                                  </span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span>{vaultData.volatility && vaultData.volatility.priceCount >= 3 ? '✅' : '❌'} Sufficient data:</span>
+                                  <span className={vaultData.volatility && vaultData.volatility.priceCount >= 3 ? 'text-green-600' : 'text-red-600'}>
+                                    {vaultData.volatility?.priceCount || 0} / 3 entries
+                                  </span>
+                                </div>
+                              </div>
+                              {(!vaultData.volatility || vaultData.volatility.currentVolatility < vaultData.rebalancing.threshold || vaultData.volatility.priceCount < 3) && (
+                                <div className="mt-3 p-2 bg-yellow-100 rounded border border-yellow-300">
+                                  <div className="text-yellow-800 font-semibold text-xs">
+                                    💡 Tip: Update volatility multiple times to build price history and create market conditions for rebalancing.
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         </AlertDescription>
                       </Alert>
                     </>
