@@ -144,7 +144,7 @@ export default function SetupPage() {
                         onClick={() => copyToClipboard(customErc20Address, 'ERC20 Address')}
                         variant="outline"
                         size="icon"
-                        className="border-2 border-[#4a90e2] text-[#4a90e2] hover:bg-[#4a90e2] hover:text-white"
+                        className="border-2 border-[#4a90e2] text-[#4a90e2] hover:bg-[#4a90e2] hover:text-white hover:text-white"
                       >
                         <Copy className="w-4 h-4" />
                       </Button>
@@ -152,7 +152,7 @@ export default function SetupPage() {
                         onClick={() => openExplorer(customErc20Address)}
                         variant="outline"
                         size="icon"
-                        className="border-2 border-[#4a90e2] text-[#4a90e2] hover:bg-[#4a90e2] hover:text-white"
+                        className="border-2 border-[#4a90e2] text-[#4a90e2] hover:bg-[#4a90e2] hover:text-white hover:text-white"
                       >
                         <ExternalLink className="w-4 h-4" />
                       </Button>
@@ -179,7 +179,7 @@ export default function SetupPage() {
                         onClick={() => copyToClipboard(vaultAddress, 'Vault Address')}
                         variant="outline"
                         size="icon"
-                        className="border-2 border-[#4a90e2] text-[#4a90e2] hover:bg-[#4a90e2] hover:text-white"
+                        className="border-2 border-[#4a90e2] text-[#4a90e2] hover:bg-[#4a90e2] hover:text-white hover:text-white"
                       >
                         <Copy className="w-4 h-4" />
                       </Button>
@@ -187,7 +187,7 @@ export default function SetupPage() {
                         onClick={() => openExplorer(vaultAddress)}
                         variant="outline"
                         size="icon"
-                        className="border-2 border-[#4a90e2] text-[#4a90e2] hover:bg-[#4a90e2] hover:text-white"
+                        className="border-2 border-[#4a90e2] text-[#4a90e2] hover:bg-[#4a90e2] hover:text-white hover:text-white"
                       >
                         <ExternalLink className="w-4 h-4" />
                       </Button>
@@ -210,7 +210,7 @@ export default function SetupPage() {
                     `NEXT_PUBLIC_CUSTOM_ERC20_ADDRESS=${customErc20Address}\nNEXT_PUBLIC_VAULT_ADDRESS=${vaultAddress}`,
                     'Environment variables'
                   )}
-                  className="bg-[#4a90e2] hover:bg-[#357abd] text-white font-bold border-2 border-[#1a2332] shadow-[4px_4px_0px_0px_#1a2332] hover:shadow-[2px_2px_0px_0px_#1a2332] transition-all"
+                  className="bg-[#4a90e2] hover:bg-[#357abd] text-white font-bold border-2 border-[#1a2332] shadow-[4px_4px_0px_0px_#1a2332] hover:shadow-[2px_2px_0px_0px_#1a2332] transition-all hover:text-white"
                 >
                   <Copy className="w-4 h-4 mr-2" />
                   Copy Environment Variables
@@ -242,7 +242,7 @@ export default function SetupPage() {
                 <p className="text-sm text-[#1a2332] font-semibold">Go to the vault page to interact with your contracts.</p>
                 <Button
                   onClick={() => window.location.href = '/vault'}
-                  className="bg-green-600 hover:bg-green-700 text-white font-bold border-2 border-[#1a2332] shadow-[4px_4px_0px_0px_#1a2332] hover:shadow-[2px_2px_0px_0px_#1a2332] transition-all"
+                  className="bg-green-600 hover:bg-green-700 text-white font-bold border-2 border-[#1a2332] shadow-[4px_4px_0px_0px_#1a2332] hover:shadow-[2px_2px_0px_0px_#1a2332] transition-all hover:text-white"
                 >
                   Go to Vault →
                 </Button>

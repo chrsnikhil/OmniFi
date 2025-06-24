@@ -169,11 +169,11 @@ function Header() {
           {/* Navigation */}
           <nav className="hidden lg:flex items-center space-x-2">
             {[
-              { name: "PROTOCOL", color: "#4a90e2", href: "#protocol" },
-              { name: "FEATURES", color: "#6c5ce7", href: "#features" },
-              { name: "TECH", color: "#00b894", href: "#tech" },
+              { name: "PROTOCOL", color: "#4a90e2", href: "/contracts" },
+              { name: "FEATURES", color: "#6c5ce7", href: "/vault" },
+              { name: "TECH", color: "#00b894", href: "/tokens" },
               { name: "TOKENIZE", color: "#fd79a8", href: "/tokenize" },
-              { name: "DEMO", color: "#fdcb6e", href: "#demo" },
+              { name: "DEMO", color: "#fdcb6e", href: "/transfer" },
             ].map((item) => (
               <motion.a
                 key={item.name}
@@ -191,9 +191,11 @@ function Header() {
           {/* CTA Buttons */}
           <div className="hidden lg:flex items-center space-x-4">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button className="bg-[#4a90e2] hover:bg-[#357abd] text-white font-black font-space-grotesk px-6 py-3 border-4 border-[#1a2332] rounded-none shadow-[4px_4px_0px_0px_white] hover:shadow-[6px_6px_0px_0px_white] transition-all duration-200">
-                <Target className="w-4 h-4 mr-2" />
-                LAUNCH APP
+              <Button asChild className="bg-[#4a90e2] hover:bg-[#357abd] text-white font-black font-space-grotesk px-6 py-3 border-4 border-[#1a2332] rounded-none shadow-[4px_4px_0px_0px_white] hover:shadow-[6px_6px_0px_0px_white] transition-all duration-200">
+                <a href="/tokenize">
+                  <Target className="w-4 h-4 mr-2" />
+                  LAUNCH APP
+                </a>
               </Button>
             </motion.div>
 
@@ -275,8 +277,8 @@ function Header() {
           </div>
 
           <div className="flex items-center space-x-6">
-            <span className="text-white">BLOCK: #892,341</span>
-            <span className="text-[#00b894]">TVL: $50.2M</span>
+            {/* Removed: <span className="text-white">BLOCK: #892,341</span> */}
+            {/* Removed: <span className="text-[#00b894]">TVL: $50.2M</span> */}
           </div>
         </motion.div>
       </div>
@@ -336,7 +338,7 @@ export default function OmniFiLanding() {
       <Header />
 
       {/* Hero Section */}
-      <motion.section style={{ y: heroY }} className="py-16 px-6 relative">
+      <motion.section style={{ y: heroY }} className="pt-6 px-6 relative">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-auto lg:h-[800px]">
             {/* Main Hero Card */}
@@ -391,44 +393,6 @@ export default function OmniFiLanding() {
                     </p>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 relative z-10">
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Button
-                        size="lg"
-                        asChild
-                        className="bg-[#1a2332] hover:bg-[#2d3748] text-white font-black font-space-grotesk px-8 py-4 text-lg border-4 border-[#1a2332] rounded-none shadow-[8px_8px_0px_0px_#4a90e2] hover:shadow-[12px_12px_0px_0px_#4a90e2] transition-all duration-200"
-                        onClick={() => router.push("/tokenize")}
-                      >
-                        <a href="/vault">
-                          <Rocket className="mr-3 h-6 w-6" />
-                          LAUNCH VAULT
-                        </a>
-                      </Button>
-                    </motion.div>
-
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Button
-                        size="lg"
-                        className="bg-[#00b894] hover:bg-[#00a085] text-white font-black font-space-grotesk px-8 py-4 text-lg border-4 border-[#00b894] rounded-none shadow-[8px_8px_0px_0px_#1a2332] hover:shadow-[12px_12px_0px_0px_#1a2332] transition-all duration-200"
-                        onClick={() => router.push("/transfer")}
-                      >
-                        <Zap className="mr-3 h-6 w-6" />
-                        CROSS-CHAIN TRANSFER
-                      </Button>
-                    </motion.div>
-
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Button
-                        variant="outline"
-                        className="bg-white border-4 border-[#1a2332] text-[#1a2332] hover:bg-[#f5f5f5] font-black font-space-grotesk px-8 py-4 text-lg rounded-none shadow-[8px_8px_0px_0px_#6c5ce7] hover:shadow-[12px_12px_0px_0px_#6c5ce7] transition-all duration-200"
-                        onClick={() => router.push("/tokens")}
-                      >
-                        <Database className="mr-3 h-6 w-6" />
-                        VIEW TOKENS
-                      </Button>
-                    </motion.div>
-                  </div>
-
                   {/* Floating 3D Elements */}
                   <FloatingElement delay={0.5} className="absolute top-20 right-20">
                     <div className="w-16 h-16 bg-[#fd79a8] border-4 border-[#1a2332] rounded-none transform rotate-12 shadow-[4px_4px_0px_0px_#1a2332]" />
@@ -437,6 +401,9 @@ export default function OmniFiLanding() {
                   <FloatingElement delay={1} className="absolute bottom-32 right-12">
                     <div className="w-12 h-12 bg-[#00b894] border-4 border-[#1a2332] rounded-none transform -rotate-12 shadow-[4px_4px_0px_0px_#1a2332]" />
                   </FloatingElement>
+
+                  {/* Preserve card height after removing main hero card buttons for alignment */}
+                  <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 relative z-10 min-h-[56px]" />
                 </CardContent>
               </CellShadedCard>
             </motion.div>
@@ -465,10 +432,10 @@ export default function OmniFiLanding() {
 
                       <div className="grid grid-cols-2 gap-4">
                         {[
-                          { label: "TVL", value: "$50.2M", color: "#00b894" },
-                          { label: "USERS", value: "10K+", color: "#4a90e2" },
-                          { label: "CHAINS", value: "12", color: "#6c5ce7" },
-                          { label: "APY", value: "24.5%", color: "#fdcb6e" },
+                          { label: "CONTRACTS", value: "5+", color: "#00b894" },
+                          { label: "DEPLOYMENT", value: "Fuji Testnet", color: "#4a90e2" },
+                          { label: "CHAINS", value: "3", color: "#6c5ce7" },
+                          { label: "APY", value: "4.2%", color: "#fdcb6e" },
                         ].map((stat, i) => (
                           <motion.div
                             key={stat.label}
@@ -509,7 +476,7 @@ export default function OmniFiLanding() {
                     <div className="space-y-4">
                       {[
                         { icon: Database, text: "RWA INTEGRATION", color: "#fdcb6e" },
-                        { icon: Bot, text: "AI OPTIMIZATION", color: "#00b894" },
+                        { icon: Bot, text: "VOLATILITY BASED OPTIMIZATION", color: "#00b894" },
                         { icon: Shield, text: "MULTI-CHAIN SECURITY", color: "#fd79a8" },
                       ].map((item, i) => (
                         <motion.div
@@ -538,12 +505,7 @@ export default function OmniFiLanding() {
       </motion.section>
 
       {/* Vault CTA Section */}
-      <motion.section 
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.8 }}
-        className="py-12 px-6 relative"
-      >
+      <motion.section className="px-6 relative">
         <div className="max-w-4xl mx-auto">
           <CellShadedCard color="#00b894">
             <CardContent className="p-8 bg-[#00b894] text-white relative overflow-hidden">
@@ -554,57 +516,39 @@ export default function OmniFiLanding() {
                 <div className="flex-1 space-y-4">
                   <div className="flex items-center space-x-4">
                     <FloatingElement>
-                      <div className="w-16 h-16 bg-white border-4 border-[#1a2332] rounded-none flex items-center justify-center shadow-[4px_4px_0px_0px_#1a2332]">
-                        <TrendingUp className="w-8 h-8 text-[#00b894]" />
+                      <div className="w-12 h-12 bg-[#00b894] border-4 border-[#1a2332] rounded-none flex items-center justify-center shadow-[4px_4px_0px_0px_#1a2332]">
+                        <Sparkles className="w-8 h-8 text-white" />
                       </div>
                     </FloatingElement>
-                    <div>
-                      <h3 className="text-3xl font-black font-space-grotesk text-white tracking-wider">
-                        CARBON CREDIT VAULT
-                      </h3>
-                      <p className="text-white/80 font-bold font-mono">LIVE ON AVALANCHE FUJI</p>
-                    </div>
+                    <h3 className="text-2xl font-black text-[#1a2332] font-space-grotesk tracking-wider">Explore OmniFi</h3>
                   </div>
-                  
-                  <p className="text-white text-lg font-bold max-w-lg leading-relaxed font-mono">
-                    TOKENIZE REAL-WORLD ASSETS AND EARN OPTIMIZED YIELDS WITH AI-POWERED AUTOMATION AND CHAINLINK ORACLES.
+                  <p className="text-[#2d3748] text-lg font-bold font-mono leading-relaxed">
+                    OmniFi is a next-generation DeFi protocol offering:
                   </p>
-                  
-                  <div className="flex items-center space-x-2 text-white/80">
-                    <Coins className="w-5 h-5" />
-                    <span className="font-mono text-sm">
-                      Need CCT tokens? <a href="/tokenize" className="underline hover:text-white transition-colors">Get them here</a>
-                    </span>
+                  <ul className="list-disc pl-6 space-y-2 text-[#2d3748] font-mono text-base">
+                    <li>Tokenize real-world assets (RWA) for on-chain utility</li>
+                    <li>AI-powered yield optimization and automation</li>
+                    <li>Cross-chain transfers for seamless asset movement</li>
+                    <li>Dynamic vaults with risk-aware rebalancing</li>
+                    <li>Transparent contract access and analytics</li>
+                  </ul>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                    <Button asChild className="bg-[#4a90e2] hover:bg-[#357abd] text-white font-black font-space-grotesk px-4 py-2 border-2 border-[#1a2332] rounded-none shadow-[4px_4px_0px_0px_#1a2332] hover:shadow-[6px_6px_0px_0px_#1a2332] transition-all">
+                      <a href="/tokenize">Tokenize Assets</a>
+                    </Button>
+                    <Button asChild className="bg-[#00b894] hover:bg-[#00a085] text-white font-black font-space-grotesk px-4 py-2 border-2 border-[#1a2332] rounded-none shadow-[4px_4px_0px_0px_#1a2332] hover:shadow-[6px_6px_0px_0px_#1a2332] transition-all">
+                      <a href="/vault">Vault Dashboard</a>
+                    </Button>
+                    <Button asChild className="bg-[#6c5ce7] hover:bg-[#5a4fcf] text-white font-black font-space-grotesk px-4 py-2 border-2 border-[#1a2332] rounded-none shadow-[4px_4px_0px_0px_#1a2332] hover:shadow-[6px_6px_0px_0px_#1a2332] transition-all">
+                      <a href="/tokens">Your Tokens</a>
+                    </Button>
+                    <Button asChild className="bg-[#fdcb6e] hover:bg-[#e17055] text-[#1a2332] font-black font-space-grotesk px-4 py-2 border-2 border-[#1a2332] rounded-none shadow-[4px_4px_0px_0px_#1a2332] hover:shadow-[6px_6px_0px_0px_#1a2332] transition-all">
+                      <a href="/transfer">Cross-Chain Transfer</a>
+                    </Button>
+                    <Button asChild className="bg-white hover:bg-gray-100 text-[#1a2332] font-black font-space-grotesk px-4 py-2 border-2 border-[#1a2332] rounded-none shadow-[4px_4px_0px_0px_#1a2332] hover:shadow-[6px_6px_0px_0px_#1a2332] transition-all col-span-1 sm:col-span-2">
+                      <a href="/contracts">View Contracts</a>
+                    </Button>
                   </div>
-                </div>
-
-                <div className="flex flex-col space-y-4">
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button
-                      size="lg"
-                      asChild
-                      className="bg-white hover:bg-gray-100 text-[#00b894] font-black font-space-grotesk px-8 py-4 text-lg border-4 border-[#1a2332] rounded-none shadow-[8px_8px_0px_0px_#1a2332] hover:shadow-[12px_12px_0px_0px_#1a2332] transition-all duration-200"
-                    >
-                      <a href="/vault">
-                        <Database className="mr-3 h-6 w-6" />
-                        ENTER VAULT
-                      </a>
-                    </Button>
-                  </motion.div>
-                  
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      asChild
-                      className="bg-transparent border-4 border-white text-white hover:bg-white/10 font-black font-space-grotesk px-8 py-4 text-lg rounded-none shadow-[8px_8px_0px_0px_rgba(255,255,255,0.3)] hover:shadow-[12px_12px_0px_0px_rgba(255,255,255,0.3)] transition-all duration-200"
-                    >
-                      <a href="/contracts">
-                        <Shield className="mr-3 h-6 w-6" />
-                        VIEW CONTRACTS
-                      </a>
-                    </Button>
-                  </motion.div>
                 </div>
               </div>
 
@@ -692,7 +636,7 @@ export default function OmniFiLanding() {
               {
                 step: "01",
                 title: "CONNECT WALLET",
-                description: "Link your Web3 wallet to access the OmniFi protocol and start your DeFi journey.",
+                description: "Link your Web3 wallet to access the OmniFi protocol and start your DeFi journey and Protect your assets ",
                 icon: Wallet,
                 color: "#4a90e2",
               },
@@ -714,7 +658,7 @@ export default function OmniFiLanding() {
               {
                 step: "04",
                 title: "EARN REWARDS",
-                description: "Watch your assets grow with automated yield farming and cross-chain arbitrage.",
+                description: "Watch your assets grow with automated yield farming and cross-chain arbitrage all while protecting your assets",
                 icon: Star,
                 color: "#fdcb6e",
               },
@@ -952,13 +896,13 @@ export default function OmniFiLanding() {
               },
               {
                 title: "CROSS-CHAIN FLOW",
-                description: "Move assets across chains to capture best opportunities.",
+                description: "Move assets across chains to capture best opportunities all while being safe",
                 color: "#fdcb6e",
                 icon: Network,
               },
               {
                 title: "CHAINLINK AUTOMATION",
-                description: "Reliable automation ensures flawless execution.",
+                description: "Reliable automation ensures flawless execution and maximize yield ",
                 color: "#fd79a8",
                 icon: Zap,
               },
@@ -1053,9 +997,12 @@ export default function OmniFiLanding() {
                 <Button
                   variant="outline"
                   className="bg-white border-4 border-[#4a90e2] text-[#1a2332] hover:bg-[#f5f5f5] font-black font-space-grotesk px-12 py-6 text-xl rounded-none shadow-[12px_12px_0px_0px_#4a90e2] hover:shadow-[16px_16px_0px_0px_#4a90e2] transition-all duration-200"
+                  asChild
                 >
-                  <Github className="h-8 w-8 mr-4" />
-                  VIEW ON GITHUB
+                  <a href="https://github.com/chrsnikhil/OmniFi" target="_blank" rel="noopener noreferrer">
+                    <Github className="h-8 w-8 mr-4" />
+                    VIEW ON GITHUB
+                  </a>
                 </Button>
               </motion.div>
             </motion.div>
@@ -1064,9 +1011,9 @@ export default function OmniFiLanding() {
           {/* Stats */}
           <motion.div variants={fadeInUp} className="flex justify-center space-x-12 pt-8">
             {[
-              { label: "SMART CONTRACTS", value: "15+", color: "#00b894" },
-              { label: "CODE COMMITS", value: "500+", color: "#4a90e2" },
-              { label: "SUPPORTED TOKENS", value: "25+", color: "#6c5ce7" },
+              { label: "SMART CONTRACTS", value: "5+", color: "#00b894" },
+              { label: "CODE COMMITS", value: "100+", color: "#4a90e2" },
+              { label: "RWA TOKENS", value: "5", color: "#6c5ce7" },
             ].map((stat, index) => (
               <div key={stat.label} className="text-center">
                 <FloatingElement delay={index * 0.2}>

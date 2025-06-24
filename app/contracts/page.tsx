@@ -23,7 +23,7 @@ export default function ContractsPage() {
     
     const contracts = [
       {
-        name: 'Carbon Credit Token (CCT)',
+        name: 'Real World Asset Tokens (RWA TOKENS)',
         address: process.env.NEXT_PUBLIC_CUSTOM_ERC20_ADDRESS || '',
         type: 'ERC20'
       },
@@ -65,131 +65,99 @@ export default function ContractsPage() {
   const explorerUrl = 'https://testnet.snowtrace.io';
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Contract Status</h1>
-        <p className="text-muted-foreground">
-          Check the deployment status of OmniFi smart contracts on Avalanche Fuji testnet.
-        </p>
-      </div>
-
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center gap-2">
-          <Badge variant="outline">
-            Avalanche Fuji Testnet
-          </Badge>
-          <Badge variant="outline">
-            Chain ID: 43113
-          </Badge>
+    <div className="min-h-screen bg-[#f5f5f5] bg-[linear-gradient(#4a90e2_1px,transparent_1px),linear-gradient(90deg,#4a90e2_1px,transparent_1px)] bg-[size:20px_20px] p-8">
+      <div className="max-w-4xl mx-auto space-y-8">
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl md:text-5xl font-black text-[#1a2332] font-space-grotesk tracking-wider mb-2">Contract Status</h1>
+          <p className="text-lg text-[#2d3748] font-mono font-bold">Check the deployment status of OmniFi smart contracts on Avalanche Fuji testnet.</p>
         </div>
-        
-        <Button 
-          onClick={checkContracts} 
-          disabled={isLoading}
-          variant="outline"
-          size="sm"
-        >
-          {isLoading ? (
-            <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-          ) : (
-            <RefreshCw className="w-4 h-4 mr-2" />
-          )}
-          Refresh
-        </Button>
-      </div>
 
-      <div className="grid gap-4">
-        {contractStatuses.map((contract, index) => (
-          <Card key={index}>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">{contract.name}</CardTitle>
-                {contract.isValid ? (
-                  <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
-                    <CheckCircle className="w-3 h-3 mr-1" />
-                    Deployed
-                  </Badge>
-                ) : (
-                  <Badge variant="destructive">
-                    <XCircle className="w-3 h-3 mr-1" />
-                    Not Found
-                  </Badge>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Contract Address
-                  </label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <code className="bg-muted px-2 py-1 rounded text-sm font-mono">
-                      {contract.address || 'Not configured'}
-                    </code>
-                    {contract.address && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        asChild
-                      >
-                        <a
-                          href={`${explorerUrl}/address/${contract.address}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
-                      </Button>
-                    )}
-                  </div>
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-2">
+            <Badge className="bg-[#4a90e2] border-2 border-[#1a2332] text-white font-bold font-space-grotesk px-3 py-1 shadow-[2px_2px_0px_0px_#1a2332]">Avalanche Fuji Testnet</Badge>
+            <Badge className="bg-[#1a2332] border-2 border-[#4a90e2] text-white font-bold font-space-grotesk px-3 py-1 shadow-[2px_2px_0px_0px_#4a90e2]">Chain ID: 43113</Badge>
+          </div>
+          <Button 
+            onClick={checkContracts} 
+            disabled={isLoading}
+            className="bg-white border-4 border-[#4a90e2] text-[#1a2332] font-black font-space-grotesk px-6 py-2 shadow-[4px_4px_0px_0px_#4a90e2] hover:shadow-[6px_6px_0px_0px_#4a90e2] transition-all hover:text-white"
+            size="sm"
+          >
+            {isLoading ? (
+              <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <RefreshCw className="w-4 h-4 mr-2" />
+            )}
+            Refresh
+          </Button>
+        </div>
+
+        <div className="grid gap-6">
+          {contractStatuses.map((contract, index) => (
+            <Card key={index} className="bg-white border-4 border-[#1a2332] shadow-[8px_8px_0px_0px_#4a90e2]">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-xl font-black font-space-grotesk text-[#1a2332]">{contract.name}</CardTitle>
+                  {contract.isValid ? (
+                    <Badge className="bg-[#00b894] border-2 border-[#1a2332] text-white font-bold font-space-grotesk px-3 py-1 shadow-[2px_2px_0px_0px_#1a2332] flex items-center">
+                      <CheckCircle className="w-4 h-4 mr-1" />
+                      Deployed
+                    </Badge>
+                  ) : (
+                    <Badge className="bg-[#fdcb6e] border-2 border-[#1a2332] text-[#1a2332] font-bold font-space-grotesk px-3 py-1 shadow-[2px_2px_0px_0px_#4a90e2] flex items-center">
+                      <XCircle className="w-4 h-4 mr-1" />
+                      Not Found
+                    </Badge>
+                  )}
                 </div>
-
-                {contract.error && (
-                  <div className="bg-red-50 border border-red-200 rounded-md p-3">
-                    <p className="text-sm text-red-700">
-                      <strong>Error:</strong> {contract.error}
-                    </p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-bold font-space-grotesk text-[#2d3748]">Contract Address</label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <code className="bg-[#f5f5f5] border border-gray-300 px-2 py-1 rounded text-sm font-mono text-[#1a2332]">{contract.address || 'Not configured'}</code>
+                      {contract.address && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="hover:bg-[#4a90e2]/10 hover:text-white"
+                          asChild
+                        >
+                          <a
+                            href={`${explorerUrl}/address/${contract.address}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </a>
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                )}
 
-                {!contract.address && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
-                    <p className="text-sm text-yellow-700">
-                      <strong>Missing Configuration:</strong> Add this contract address to your <code>.env.local</code> file.
-                    </p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                  {contract.error && (
+                    <div className="bg-[#fd79a8]/10 border-2 border-[#fd79a8] rounded-md p-4 shadow-[2px_2px_0px_0px_#fd79a8]">
+                      <p className="text-sm font-bold font-space-grotesk text-[#fd79a8]">
+                        <strong>Error:</strong> {contract.error}
+                      </p>
+                    </div>
+                  )}
+
+                  {!contract.address && (
+                    <div className="bg-[#fdcb6e]/10 border-2 border-[#fdcb6e] rounded-md p-4 shadow-[2px_2px_0px_0px_#fdcb6e]">
+                      <p className="text-sm font-bold font-space-grotesk text-[#b8860b]">
+                        <strong>Missing Configuration:</strong> Add this contract address to your <code className="bg-white border border-gray-300 px-1 rounded">.env.local</code> file.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
       </div>
-
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle>Troubleshooting</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <h4 className="font-medium mb-2">If contracts are not found:</h4>
-            <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
-              <li>Check that contract addresses are correctly set in your <code>.env.local</code> file</li>
-              <li>Verify contracts are deployed to Avalanche Fuji testnet (Chain ID: 43113)</li>
-              <li>Make sure you're connected to the correct network</li>
-              <li>Try redeploying contracts using the Hardhat deployment scripts</li>
-            </ul>
-          </div>
-          
-          <div>
-            <h4 className="font-medium mb-2">Next steps:</h4>
-            <ul className="list-disc pl-5 space-y-1 text-sm text-muted-foreground">
-              <li>If all contracts show as deployed, you can proceed to the <a href="/vault" className="text-blue-600 hover:underline">Vault page</a></li>
-              <li>If contracts are missing, deploy them using: <code>cd hardhat && npx hardhat run scripts/deploy.ts --network fuji</code></li>
-            </ul>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

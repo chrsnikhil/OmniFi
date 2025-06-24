@@ -130,10 +130,10 @@ export default function TokensPage() {
                         </button>
                       </motion.a>
                       <motion.button
-                        className="bg-white border-4 border-[#1a2332] text-[#1a2332] hover:bg-gray-100 font-black font-space-grotesk px-4 py-2 shadow-[4px_4px_0px_0px_#4a90e2] text-xs rounded transition-all"
+                        className="bg-white border-4 border-[#1a2332] text-[#1a2332] hover:bg-gray-100 font-black font-space-grotesk px-4 py-2 shadow-[4px_4px_0px_0px_#4a90e2] text-xs rounded transition-all hover:text-white"
                         whileHover={{ scale: 1.04 }}
                         whileTap={{ scale: 0.97 }}
-                        transition={{ type: "spring", stiffness: 300 }}
+                        transition={{ type: 'spring', stiffness: 300 }}
                         onClick={() => {
                           if (window.ethereum) {
                             (window.ethereum as any).request({

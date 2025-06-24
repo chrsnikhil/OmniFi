@@ -128,7 +128,8 @@ export default function VaultPage() {
   };
 
   const formatTime = (timestamp: number) => {
-    if (timestamp === 0) return 'Never';
+    if (!timestamp || timestamp === 0) return 'Never';
+    if (timestamp * 1000 < Date.now()) return 'Not eligible';
     return new Date(timestamp * 1000).toLocaleString();
   };
 
@@ -148,9 +149,9 @@ export default function VaultPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5]">
+    <div className="min-h-screen bg-[#f5f5f5] bg-[linear-gradient(#4a90e2_1px,transparent_1px),linear-gradient(90deg,#4a90e2_1px,transparent_1px)] bg-[size:20px_20px]">
       <NavigationHeader />
-      <div className="bg-[#f5f5f5] bg-[linear-gradient(#4a90e2_1px,transparent_1px),linear-gradient(90deg,#4a90e2_1px,transparent_1px)] bg-[size:20px_20px] p-8">
+      <div className="p-8">
         <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
         <motion.div
@@ -275,7 +276,7 @@ export default function VaultPage() {
                 <CardContent className="space-y-4">
                   <div className="text-center">
                     <div className="text-4xl font-black text-[#e94e77] mb-2">
-                      {vaultData.volatility ? (vaultData.volatility.currentVolatility / 10).toFixed(1) : '0.0'}%
+                      {vaultData.volatility ? (vaultData.volatility.currentVolatility / 100).toFixed(2) : '0.00'}%
                     </div>
                     <Badge 
                       className={`${getVolatilityStatus(vaultData.volatility?.currentVolatility || 0).color} text-white font-bold px-3 py-1`}
@@ -861,7 +862,7 @@ export default function VaultPage() {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
                   <div className="space-y-2">
-                    <div className="text-4xl">�</div>
+                    <div className="text-4xl">💸</div>
                     <h3 className="font-black text-[#1a2332]">Price Monitoring</h3>
                     <p className="text-sm text-[#1a2332] font-semibold">
                       Chainlink Data Feeds track ETH/USD price changes continuously

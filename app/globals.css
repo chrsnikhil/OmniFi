@@ -387,3 +387,18 @@ body {
   border-color: #fdcb6e !important;
   box-shadow: 4px 4px 0px 0px #fdcb6e !important;
 }
+
+/* Force all accent/yellow hover text utilities to use black for accessibility */
+.hover\:text-accent-foreground:hover,
+.hover\:text-yellow-50:hover,
+.hover\:text-yellow-100:hover,
+.hover\:text-yellow-200:hover,
+.hover\:text-yellow-300:hover,
+.hover\:text-yellow-400:hover,
+.hover\:text-yellow-500:hover,
+.hover\:text-yellow-600:hover,
+.hover\:text-yellow-700:hover,
+.hover\:text-yellow-800:hover,
+.hover\:text-yellow-900:hover {
+  color: #1a2332 !important;
+}

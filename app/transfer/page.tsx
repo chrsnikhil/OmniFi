@@ -81,13 +81,22 @@ export default function CrossChainTransferPage() {
     }
   }, [authenticated, user?.wallet?.address, fetchBalances])
 
-  // Show success alert when transfer completes
+  // Show success alert and reset transfer state after completion
   useEffect(() => {
     if (transferState.status === 'completed') {
       setShowSuccessAlert(true)
-      setTimeout(() => setShowSuccessAlert(false), 5000)
+      const alertTimeout = setTimeout(() => setShowSuccessAlert(false), 5000)
+      const resetTimeout = setTimeout(() => {
+        if (transferState.status === 'completed') {
+          resetTransfer()
+        }
+      }, 3000)
+      return () => {
+        clearTimeout(alertTimeout)
+        clearTimeout(resetTimeout)
+      }
     }
-  }, [transferState.status])
+  }, [transferState.status, resetTransfer])
 
   const getFujiBalance = () => {
     const fujiBalance = balances.find(b => b.chainId === '43113')
@@ -183,9 +192,9 @@ export default function CrossChainTransferPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5]">
+    <div className="min-h-screen bg-[#f5f5f5] bg-[linear-gradient(#4a90e2_1px,transparent_1px),linear-gradient(90deg,#4a90e2_1px,transparent_1px)] bg-[size:20px_20px]">
       <NavigationHeader />
-      <div className="bg-[#f5f5f5] bg-[linear-gradient(#4a90e2_1px,transparent_1px),linear-gradient(90deg,#4a90e2_1px,transparent_1px)] bg-[size:20px_20px] p-8">
+      <div className="p-8">
         <div className="max-w-7xl mx-auto space-y-8">
         
         {/* Header */}
@@ -300,14 +309,10 @@ export default function CrossChainTransferPage() {
                   className="w-full bg-[#1a2332] hover:bg-[#2d3748] text-white font-black font-space-grotesk px-8 py-6 border-4 border-[#1a2332] shadow-[8px_8px_0px_0px_#4a90e2] hover:shadow-[12px_12px_0px_0px_#4a90e2] transition-all text-lg disabled:opacity-50"
                 >
                   {transferState.status !== 'idle' ? (
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-                      className="flex items-center gap-2"
-                    >
+                    <div className="flex items-center gap-2">
                       <Zap className="w-5 h-5" />
                       {getStatusText(transferState.status)}
-                    </motion.div>
+                    </div>
                   ) : (
                     <div className="flex items-center gap-2">
                       <ArrowRight className="w-5 h-5" />
@@ -315,89 +320,6 @@ export default function CrossChainTransferPage() {
                     </div>
                   )}
                 </Button>
-
-                {/* Debug Section */}
-                {authenticated && (
-                  <div className="bg-[#f5f5f5] border-4 border-orange-400 p-4 shadow-[4px_4px_0px_0px_orange-400]">
-                    <h4 className="font-bold font-space-grotesk text-[#1a2332] mb-2">🔧 DEBUG INFO</h4>
-                    
-                    {/* Bridge Mode Status Badge */}
-                    {user?.wallet?.address !== '0x3aC23Fc97c9BED195A1CA74B593eDBf6d5688EaF' && (
-                      <div className="mb-3 p-2 bg-blue-100 border-2 border-blue-500 rounded">
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-                          <span className="text-sm font-bold text-blue-800">
-                            🌉 BRIDGE MODE: Tokens delivered via cross-chain simulation
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                    
-                    <div className="space-y-2 text-xs font-mono">
-                      <p><strong>Wallet:</strong> {user?.wallet?.address?.slice(0, 10)}...</p>
-                      <p><strong>Fuji Balance:</strong> {getFujiBalance().toFixed(4)} CCT</p>
-                      <p><strong>Base Balance:</strong> {getBaseBalance().toFixed(4)} CCT</p>
-                      <p><strong>Transfer Status:</strong> {transferState.status}</p>
-                      {transferState.txHash && <p><strong>Last TX:</strong> {transferState.txHash.slice(0, 20)}...</p>}
-                      {transferState.bridgeNote && <p><strong>Bridge:</strong> {transferState.bridgeNote}</p>}
-                      <p><strong>Bridge Mode:</strong> {user?.wallet?.address === '0x3aC23Fc97c9BED195A1CA74B593eDBf6d5688EaF' ? 'Owner (Direct)' : 'Bridge (Simulation)'}</p>
-                    </div>
-                    <div className="flex gap-2 mt-3">
-                      <Button
-                        onClick={() => fetchBalances()}
-                        size="sm"
-                        className="bg-orange-400 hover:bg-orange-500 text-white font-bold text-xs"
-                      >
-                        Refresh Balances
-                      </Button>
-                      <Button
-                        onClick={() => console.log('Current state:', { transferState, balances })}
-                        size="sm"
-                        variant="outline"
-                        className="border-orange-400 text-orange-400 hover:bg-orange-50 font-bold text-xs"
-                      >
-                        Log State
-                      </Button>
-                      {transferAmount && parseFloat(transferAmount) > 0 && (
-                        <Button
-                          onClick={handleTestMint}
-                          size="sm"
-                          className="bg-blue-500 hover:bg-blue-600 text-white font-bold text-xs"
-                        >
-                          {user?.wallet?.address === '0x3aC23Fc97c9BED195A1CA74B593eDBf6d5688EaF' 
-                            ? `Direct Mint ${transferAmount}` 
-                            : `Simulate ${transferAmount}`}
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Bridge Info Panel */}
-                <div className="bg-blue-50 border-4 border-blue-300 p-4 shadow-[4px_4px_0px_0px_blue-300]">
-                  <h4 className="font-bold font-space-grotesk text-[#1a2332] mb-2 flex items-center gap-2">
-                    🌉 HOW CROSS-CHAIN BRIDGE WORKS
-                  </h4>
-                  <div className="text-xs font-mono text-[#2d3748] space-y-1">
-                    <p><strong>1. BURN:</strong> Tokens are burned on source chain (Fuji)</p>
-                    <p><strong>2. VERIFY:</strong> Bridge verifies burn transaction</p>
-                    <p><strong>3. MINT:</strong> Bridge mints equivalent tokens on destination chain</p>
-                    <p><strong>4. DELIVER:</strong> New tokens delivered to your address</p>
-                  </div>
-                  <div className="mt-3 p-2 bg-blue-100 border-2 border-blue-400 rounded">
-                    <p className="text-xs font-mono text-blue-800">
-                      💡 <strong>Note:</strong> This demo uses bridge simulation for cross-chain transfers. 
-                      Tokens are burned on the source chain and credited to your balance on the destination 
-                      chain using a time-delayed mechanism that mimics real bridge processing.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Estimated Fees */}
-                <div className="text-center space-y-1">
-                  <p className="text-sm font-mono text-[#2d3748]">ESTIMATED GAS: ~$0.02</p>
-                  <p className="text-xs font-mono text-[#2d3748]">CHAINLINK FUNCTIONS: INCLUDED</p>
-                </div>
 
               </CardContent>
             </Card>
@@ -407,9 +329,9 @@ export default function CrossChainTransferPage() {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="lg:col-span-2"
+            className="lg:col-span-2 flex flex-col h-full"
           >
-            <Card className="bg-white border-4 border-[#1a2332] shadow-[12px_12px_0px_0px_#4a90e2]">
+            <Card className="bg-white border-4 border-[#1a2332] shadow-[12px_12px_0px_0px_#4a90e2] flex flex-col h-full">
               <CardHeader>
                 <CardTitle className="text-2xl font-black font-space-grotesk text-[#1a2332] flex items-center gap-2">
                   <TrendingUp className="w-6 h-6 text-[#00b894]" />
@@ -419,16 +341,16 @@ export default function CrossChainTransferPage() {
                   POWERED BY CHAINLINK FUNCTIONS • UPDATED EVERY 30 SECONDS
                 </p>
               </CardHeader>
-              <CardContent>
-                <div className="overflow-hidden border-4 border-[#1a2332] shadow-[4px_4px_0px_0px_#1a2332]">
-                  <Table>
+              <CardContent className="flex-1 flex flex-col justify-between">
+                <div className="overflow-hidden border-4 border-[#1a2332] shadow-[4px_4px_0px_0px_#1a2332] min-h-[340px]">
+                  <Table className="w-full text-lg">
                     <TableHeader className="bg-[#1a2332]">
                       <TableRow>
-                        <TableHead className="text-white font-black font-space-grotesk">CHAIN</TableHead>
-                        <TableHead className="text-white font-black font-space-grotesk">APY</TableHead>
-                        <TableHead className="text-white font-black font-space-grotesk">TVL</TableHead>
-                        <TableHead className="text-white font-black font-space-grotesk">GAS</TableHead>
-                        <TableHead className="text-white font-black font-space-grotesk">STATUS</TableHead>
+                        <TableHead className="text-white font-black font-space-grotesk px-6 py-4 text-xl">CHAIN</TableHead>
+                        <TableHead className="text-white font-black font-space-grotesk px-6 py-4 text-xl">APY</TableHead>
+                        <TableHead className="text-white font-black font-space-grotesk px-6 py-4 text-xl">TVL</TableHead>
+                        <TableHead className="text-white font-black font-space-grotesk px-6 py-4 text-xl">GAS</TableHead>
+                        <TableHead className="text-white font-black font-space-grotesk px-6 py-4 text-xl">STATUS</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -440,45 +362,40 @@ export default function CrossChainTransferPage() {
                           transition={{ delay: index * 0.1 }}
                           className="border-b-2 border-[#f5f5f5] hover:bg-[#f5f5f5] transition-colors"
                         >
-                          <TableCell className="font-bold font-space-grotesk text-[#1a2332]">
-                            <div className="flex items-center gap-2">
+                          <TableCell className="font-bold font-space-grotesk text-[#1a2332] px-6 py-5 text-lg">
+                            <div className="flex items-center gap-3">
                               <div 
-                                className="w-3 h-3 rounded-full border-2 border-[#1a2332]"
+                                className="w-4 h-4 rounded-full border-2 border-[#1a2332]"
                                 style={{ backgroundColor: chain.color }}
                               />
                               {chain.name}
                             </div>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="px-6 py-5 text-lg">
                             <div className="flex items-center gap-2">
-                              <span className="text-xl font-black font-space-grotesk text-[#00b894]">
+                              <span className="text-2xl font-black font-space-grotesk text-[#00b894]">
                                 {chain.yield}%
                               </span>
                               {chain.yield > 5 && (
-                                <motion.div
-                                  animate={{ scale: [1, 1.1, 1] }}
-                                  transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY }}
-                                >
-                                  <TrendingUp className="w-4 h-4 text-[#00b894]" />
-                                </motion.div>
+                                <TrendingUp className="w-5 h-5 text-[#00b894]" />
                               )}
                             </div>
                           </TableCell>
-                          <TableCell className="font-mono font-bold text-[#2d3748]">
+                          <TableCell className="font-mono font-bold text-[#2d3748] px-6 py-5 text-lg">
                             {chain.tvl}
                           </TableCell>
-                          <TableCell className="font-mono text-[#2d3748]">
+                          <TableCell className="font-mono text-[#2d3748] px-6 py-5 text-lg">
                             {chain.gasEstimate}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="px-6 py-5 text-lg">
                             {chain.isRecommended ? (
-                              <Badge className="bg-[#00b894] text-white font-bold font-space-grotesk px-3 py-1 border-2 border-[#1a2332] shadow-[2px_2px_0px_0px_#1a2332]">
-                                🎯 OPTIMAL
+                              <Badge className="bg-[#00b894] text-white font-bold font-space-grotesk px-4 py-2 border-2 border-[#1a2332] shadow-[2px_2px_0px_0px_#1a2332] text-lg">
+                                🎯OPTIMAL
                               </Badge>
                             ) : (
                               <Badge 
                                 variant="outline"
-                                className="bg-white border-2 border-[#1a2332] text-[#1a2332] font-bold font-space-grotesk px-3 py-1 shadow-[2px_2px_0px_0px_#4a90e2]"
+                                className="bg-white border-2 border-[#1a2332] text-[#1a2332] font-bold font-space-grotesk px-4 py-2 shadow-[2px_2px_0px_0px_#4a90e2] text-lg"
                               >
                                 AVAILABLE
                               </Badge>
@@ -489,20 +406,6 @@ export default function CrossChainTransferPage() {
                     </TableBody>
                   </Table>
                 </div>
-
-                {/* Auto-selection explanation */}
-                <div className="mt-4 p-4 bg-[#f5f5f5] border-4 border-[#4a90e2] shadow-[4px_4px_0px_0px_#4a90e2]">
-                  <p className="text-sm font-bold font-space-grotesk text-[#1a2332] mb-2">
-                    🧠 AI-POWERED CHAIN SELECTION
-                  </p>
-                  <p className="text-sm font-mono text-[#2d3748]">
-                    OmniFi automatically selects the optimal destination chain based on real-time yield data, 
-                    gas costs, and liquidity. Current recommendation: 
-                    <span className="font-bold text-[#00b894]"> {getRecommendedChain().name}</span> 
-                    with <span className="font-bold text-[#00b894]">{getRecommendedChain().yield}% APY</span>.
-                  </p>
-                </div>
-
               </CardContent>
             </Card>
           </motion.div>
@@ -529,9 +432,9 @@ export default function CrossChainTransferPage() {
                     animate={{ opacity: 1, x: 0 }}
                     className="bg-[#f5f5f5] border-4 border-[#4a90e2] p-4 shadow-[4px_4px_0px_0px_#4a90e2]"
                   >
-                    <div className="flex justify-between items-start">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                       <div className="space-y-2">
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 flex-wrap">
                           {getStatusIcon(transferState.status)}
                           <span className="font-black font-space-grotesk text-[#1a2332]">
                             {transferState.burnAmount || transferAmount} CCT
@@ -553,11 +456,19 @@ export default function CrossChainTransferPage() {
                           </Badge>
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="flex flex-col items-end gap-2 min-w-[180px]">
                         {transferState.txHash && (
-                          <p className="text-xs font-mono text-[#4a90e2] break-all max-w-32">
-                            {transferState.txHash.slice(0, 10)}...
-                          </p>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-mono text-[#2d3748] font-bold">TX Hash:</span>
+                            <span className="text-xs font-mono text-[#4a90e2] break-all max-w-32">{transferState.txHash.slice(0, 10)}...</span>
+                            <button
+                              className="ml-1 px-1 py-0.5 bg-[#4a90e2] text-white rounded text-xs font-mono hover:bg-[#357abd] border border-[#1a2332]"
+                              onClick={() => navigator.clipboard.writeText(transferState.txHash || "")}
+                              title="Copy TX Hash"
+                            >
+                              Copy
+                            </button>
+                          </div>
                         )}
                         {transferState.error && (
                           <p className="text-xs font-mono text-red-500 mt-1">
@@ -565,28 +476,24 @@ export default function CrossChainTransferPage() {
                           </p>
                         )}
                         {transferState.bridgeNote && (
-                          <p className="text-xs font-mono text-blue-600 mt-1">
-                            🌉 {transferState.bridgeNote}
-                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge className="bg-blue-500 text-white font-bold font-space-grotesk px-2 py-1 border-2 border-[#1a2332]">
+                              🌉 {transferState.bridgeNote.includes('Real') ? 'REAL' : 'BRIDGE'} TRANSFER
+                            </Badge>
+                            <span className="text-xs font-mono text-blue-600">{transferState.bridgeNote}</span>
+                          </div>
                         )}
                         {transferState.status === 'waiting' && (
-                          <div className="mt-2 space-y-2">
+                          <div className="mt-2 space-y-2 w-full">
                             <Button
                               onClick={handleManualMint}
-                              className="bg-[#4a90e2] hover:bg-[#357abd] text-white font-bold font-space-grotesk px-4 py-2 border-2 border-[#1a2332] shadow-[2px_2px_0px_0px_#1a2332] block"
+                              className="bg-[#4a90e2] hover:bg-[#357abd] text-white font-bold font-space-grotesk px-4 py-2 border-2 border-[#1a2332] shadow-[2px_2px_0px_0px_#1a2332] block w-full"
                             >
                               Complete Bridge Transfer
                             </Button>
                             <p className="text-xs font-mono text-[#2d3748]">
                               🔧 In production, this would be automated by bridge infrastructure
                             </p>
-                          </div>
-                        )}
-                        {transferState.status === 'completed' && transferState.bridgeNote && (
-                          <div className="mt-2">
-                            <Badge className="bg-blue-500 text-white font-bold font-space-grotesk px-2 py-1 border-2 border-[#1a2332]">
-                              🌉 {transferState.bridgeNote.includes('Real') ? 'REAL' : 'BRIDGE'} TRANSFER
-                            </Badge>
                           </div>
                         )}
                       </div>

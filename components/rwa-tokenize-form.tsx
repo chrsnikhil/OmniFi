@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -110,6 +110,15 @@ export function RwaTokenizeForm() {
     unit: string;
     mintedTokens: string;
   } | null>(null)
+  const [showVerification, setShowVerification] = useState(false)
+  const [verificationStage, setVerificationStage] = useState(0)
+  const [verificationProgress, setVerificationProgress] = useState(0)
+  const verificationStages = [
+    { label: "Verifying Asset ID", icon: Database },
+    { label: "Checking Certification", icon: User },
+    { label: "Validating Asset Value", icon: Coins },
+    { label: "Finalizing Verification", icon: CheckCircle }
+  ]
 
   const {
     register,
@@ -135,49 +144,54 @@ export function RwaTokenizeForm() {
 
   const watchedAssetType = watch("assetType")
 
-  // Handle form submission - now mints CCT tokens instead of deploying new contracts
-  const onSubmit = async (data: RwaFormData) => {
-    if (!authenticated) {
-      toast.error("Please connect your wallet first")
-      return
+  // Animate verification stages
+  useEffect(() => {
+    let timer: NodeJS.Timeout
+    if (showVerification && verificationStage < verificationStages.length) {
+      timer = setTimeout(() => {
+        setVerificationStage((s) => s + 1)
+        setVerificationProgress(((verificationStage + 1) / verificationStages.length) * 100)
+      }, 1700) // slower: 1.7s per stage
     }
-    
+    if (showVerification && verificationStage === verificationStages.length) {
+      setTimeout(() => {
+        setShowVerification(false)
+        setVerificationStage(0)
+        setVerificationProgress(0)
+        onSubmitAfterVerification()
+      }, 1000)
+    }
+    return () => clearTimeout(timer)
+  }, [showVerification, verificationStage])
+
+  // Store form data for after verification
+  const [pendingFormData, setPendingFormData] = useState<RwaFormData | null>(null)
+  // This function is called after verification completes
+  const onSubmitAfterVerification = async () => {
+    if (!pendingFormData) return
+    // ... blockchain minting logic from onSubmit ...
     setIsSubmitting(true)
     setMintedAmount("")
-    
     try {
-      // Initialize web3 service
       await web3Service.initialize();
-      
-      // Find the selected asset type to get the multiplier
-      const selectedAsset = assetTypes.find(asset => asset.id === data.assetType);
+      const selectedAsset = assetTypes.find(asset => asset.id === pendingFormData.assetType);
       if (!selectedAsset) throw new Error("Invalid asset type selected");
-      
-      // Calculate tokens to mint based on asset value and multiplier
-      const tokensToMint = (data.value * selectedAsset.tokenMultiplier).toString();
-      
-      // Validate amount (max 1000 CCT per transaction)
+      const tokensToMint = (pendingFormData.value * selectedAsset.tokenMultiplier).toString();
       if (parseFloat(tokensToMint) > 1000) {
         throw new Error("Asset value too high. Maximum 1000 CCT tokens can be minted per transaction.");
       }
-      
       if (parseFloat(tokensToMint) <= 0) {
         throw new Error("Asset value must be greater than 0");
       }
-      
-      // Mint CCT tokens representing the RWA
       const tx = await web3Service.mintTokens(tokensToMint);
       toast.success("Minting transaction submitted!");
-      
-      // Wait for transaction to be mined
       await tx.wait();
-      
       setMintedAmount(tokensToMint);
       setTokenDetails({
         assetType: selectedAsset.name,
-        assetName: data.assetName,
-        value: data.value,
-        unit: data.unit,
+        assetName: pendingFormData.assetName,
+        value: pendingFormData.value,
+        unit: pendingFormData.unit,
         mintedTokens: tokensToMint
       });
       setShowModal(true);
@@ -189,7 +203,20 @@ export function RwaTokenizeForm() {
       toast.error(err.message || "Failed to mint tokens. Please try again.");
     } finally {
       setIsSubmitting(false);
+      setPendingFormData(null);
     }
+  }
+
+  // Modified onSubmit to trigger verification first
+  const onSubmit = async (data: RwaFormData) => {
+    if (!authenticated) {
+      toast.error("Please connect your wallet first")
+      return
+    }
+    setPendingFormData(data)
+    setShowVerification(true)
+    setVerificationStage(0)
+    setVerificationProgress(0)
   }
 
   // Handle asset type selection
@@ -567,6 +594,56 @@ export function RwaTokenizeForm() {
               <p className="text-center text-sm text-[#2d3748] font-mono">
                 Your CCT tokens have been added to your wallet balance
               </p>
+            </div>
+          </Card>
+        </div>
+      )}
+      {/* Verification Modal */}
+      {showVerification && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <Card className="relative w-full max-w-md bg-white border-4 border-[#1a2332] shadow-[12px_12px_0px_0px_#4a90e2] rounded-xl p-8 animate-fade-in">
+            {/* Step Icons Row */}
+            <div className="flex justify-center gap-6 mb-8">
+              {verificationStages.map((stage, i) => (
+                <div key={stage.label} className="flex flex-col items-center">
+                  <div className={`rounded-full border-2 flex items-center justify-center transition-all duration-300 w-10 h-10 ${
+                    i < verificationStage ? 'bg-[#00b894] border-[#00b894]' : i === verificationStage ? 'bg-[#4a90e2] border-[#4a90e2]' : 'bg-[#f5f5f5] border-[#d1d5db]'
+                  }`}>
+                    <stage.icon className={`w-6 h-6 ${i < verificationStage ? 'text-white' : i === verificationStage ? 'text-white' : 'text-[#b0b0b0]'}`} />
+                  </div>
+                  {i < verificationStage && <CheckCircle className="w-4 h-4 text-green-500 mt-1" />}
+                </div>
+              ))}
+            </div>
+            {/* Step Text */}
+            <div className="text-center mb-6 min-h-[40px] flex items-center justify-center">
+              <motion.div
+                key={verificationStage}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.7 }}
+                className="w-full"
+              >
+                <span className="font-bold font-space-grotesk text-lg text-[#1a2332]">
+                  {verificationStages[verificationStage]?.label}...
+                </span>
+              </motion.div>
+            </div>
+            <div className="w-full bg-[#f5f5f5] border-2 border-[#4a90e2] rounded-full h-5 mb-4 overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${verificationProgress}%` }}
+                transition={{ duration: 1.2 }}
+                className="h-full bg-[#4a90e2] rounded-full"
+              />
+            </div>
+            <div className="text-center mt-2">
+              <span className="font-mono text-[#2d3748] text-sm">
+                {verificationStage < verificationStages.length
+                  ? 'Processing...'
+                  : 'Verification Complete!'}
+              </span>
             </div>
           </Card>
         </div>
