@@ -16,6 +16,8 @@ import { toast } from 'sonner';
 import { motion } from "framer-motion";
 import { Rocket } from "lucide-react";
 import { PriceChart } from '@/components/price-chart';
+import { MultiChainBalance } from '@/components/multi-chain-balance';
+import { NavigationHeader } from '@/components/navigation-header';
 
 export default function VaultPage() {
   const { login, logout, authenticated, user } = usePrivy();
@@ -146,8 +148,10 @@ export default function VaultPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5] bg-[linear-gradient(#4a90e2_1px,transparent_1px),linear-gradient(90deg,#4a90e2_1px,transparent_1px)] bg-[size:20px_20px] p-8">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen bg-[#f5f5f5]">
+      <NavigationHeader />
+      <div className="bg-[#f5f5f5] bg-[linear-gradient(#4a90e2_1px,transparent_1px),linear-gradient(90deg,#4a90e2_1px,transparent_1px)] bg-[size:20px_20px] p-8">
+        <div className="max-w-6xl mx-auto space-y-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -30 }}
@@ -244,6 +248,9 @@ export default function VaultPage() {
                 </CardDescription>
               </CardHeader>
             </Card>
+
+            {/* Multi-Chain Balance Dashboard */}
+            <MultiChainBalance userAddress={user?.wallet?.address} />
 
             {/* Error Display */}
             {vaultData.error && (
@@ -909,6 +916,7 @@ export default function VaultPage() {
             </Card>
           </>
         )}
+        </div>
       </div>
     </div>
   );

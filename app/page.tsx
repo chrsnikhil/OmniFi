@@ -408,6 +408,17 @@ export default function OmniFiLanding() {
 
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                       <Button
+                        size="lg"
+                        className="bg-[#00b894] hover:bg-[#00a085] text-white font-black font-space-grotesk px-8 py-4 text-lg border-4 border-[#00b894] rounded-none shadow-[8px_8px_0px_0px_#1a2332] hover:shadow-[12px_12px_0px_0px_#1a2332] transition-all duration-200"
+                        onClick={() => router.push("/transfer")}
+                      >
+                        <Zap className="mr-3 h-6 w-6" />
+                        CROSS-CHAIN TRANSFER
+                      </Button>
+                    </motion.div>
+
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <Button
                         variant="outline"
                         className="bg-white border-4 border-[#1a2332] text-[#1a2332] hover:bg-[#f5f5f5] font-black font-space-grotesk px-8 py-4 text-lg rounded-none shadow-[8px_8px_0px_0px_#6c5ce7] hover:shadow-[12px_12px_0px_0px_#6c5ce7] transition-all duration-200"
                         onClick={() => router.push("/tokens")}
