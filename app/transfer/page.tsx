@@ -321,13 +321,13 @@ export default function CrossChainTransferPage() {
                   <div className="bg-[#f5f5f5] border-4 border-orange-400 p-4 shadow-[4px_4px_0px_0px_orange-400]">
                     <h4 className="font-bold font-space-grotesk text-[#1a2332] mb-2">🔧 DEBUG INFO</h4>
                     
-                    {/* Real Transfer Status Badge */}
+                    {/* Bridge Mode Status Badge */}
                     {user?.wallet?.address !== '0x3aC23Fc97c9BED195A1CA74B593eDBf6d5688EaF' && (
-                      <div className="mb-3 p-2 bg-green-100 border-2 border-green-500 rounded">
+                      <div className="mb-3 p-2 bg-blue-100 border-2 border-blue-500 rounded">
                         <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                          <span className="text-sm font-bold text-green-800">
-                            🔥 REAL TRANSFER MODE: You will receive actual CCT tokens!
+                          <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+                          <span className="text-sm font-bold text-blue-800">
+                            🌉 BRIDGE MODE: Tokens delivered via cross-chain simulation
                           </span>
                         </div>
                       </div>
@@ -340,7 +340,7 @@ export default function CrossChainTransferPage() {
                       <p><strong>Transfer Status:</strong> {transferState.status}</p>
                       {transferState.txHash && <p><strong>Last TX:</strong> {transferState.txHash.slice(0, 20)}...</p>}
                       {transferState.bridgeNote && <p><strong>Bridge:</strong> {transferState.bridgeNote}</p>}
-                      <p><strong>Bridge Mode:</strong> {user?.wallet?.address === '0x3aC23Fc97c9BED195A1CA74B593eDBf6d5688EaF' ? 'Owner (Direct)' : 'Bridge (Real Transfers)'}</p>
+                      <p><strong>Bridge Mode:</strong> {user?.wallet?.address === '0x3aC23Fc97c9BED195A1CA74B593eDBf6d5688EaF' ? 'Owner (Direct)' : 'Bridge (Simulation)'}</p>
                     </div>
                     <div className="flex gap-2 mt-3">
                       <Button
@@ -366,7 +366,7 @@ export default function CrossChainTransferPage() {
                         >
                           {user?.wallet?.address === '0x3aC23Fc97c9BED195A1CA74B593eDBf6d5688EaF' 
                             ? `Direct Mint ${transferAmount}` 
-                            : `Real Transfer ${transferAmount}`}
+                            : `Simulate ${transferAmount}`}
                         </Button>
                       )}
                     </div>
@@ -386,9 +386,9 @@ export default function CrossChainTransferPage() {
                   </div>
                   <div className="mt-3 p-2 bg-blue-100 border-2 border-blue-400 rounded">
                     <p className="text-xs font-mono text-blue-800">
-                      💡 <strong>Note:</strong> This demo uses REAL token transfers! For non-owners, 
-                      the bridge operator (contract owner) transfers actual tokens from their balance 
-                      to your wallet. You'll receive real CCT tokens on Base Sepolia!
+                      💡 <strong>Note:</strong> This demo uses bridge simulation for cross-chain transfers. 
+                      Tokens are burned on the source chain and credited to your balance on the destination 
+                      chain using a time-delayed mechanism that mimics real bridge processing.
                     </p>
                   </div>
                 </div>

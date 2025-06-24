@@ -48,7 +48,8 @@ const NETWORKS = {
 const CONTRACT_OWNER = "0x3aC23Fc97c9BED195A1CA74B593eDBf6d5688EaF"
 
 // Owner's private key (for bridge operations) - In production, this would be in a secure backend
-const OWNER_PRIVATE_KEY = process.env.NEXT_PUBLIC_OWNER_PRIVATE_KEY || ""
+// Disabled for demo to ensure reliable simulation
+const OWNER_PRIVATE_KEY = "" // process.env.NEXT_PUBLIC_OWNER_PRIVATE_KEY || ""
 
 interface TransferState {
   status: 'idle' | 'burning' | 'waiting' | 'minting' | 'completed' | 'error'
