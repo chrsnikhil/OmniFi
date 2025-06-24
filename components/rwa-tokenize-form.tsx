@@ -28,7 +28,10 @@ import {
   Loader2,
   User,
   Database,
-  Home
+  Home,
+  Sparkles,
+  Shield,
+  Rocket
 } from "lucide-react"
 import { toast } from "sonner"
 import { web3Service } from "@/lib/web3"
@@ -110,6 +113,32 @@ export function RwaTokenizeForm() {
     unit: string;
     mintedTokens: string;
   } | null>(null)
+  const [showVerification, setShowVerification] = useState(false)
+  const [verificationStep, setVerificationStep] = useState(0)
+  const [verificationProgress, setVerificationProgress] = useState(0)
+  const [verificationDone, setVerificationDone] = useState(false)
+
+  // Steps for the verification modal (add a couple more for a total of 6 steps)
+  const verificationSteps = [
+    {
+      icon: <Shield className="h-10 w-10 text-[#4a90e2] mx-auto" />, label: "Verifying Asset Data"
+    },
+    {
+      icon: <Sparkles className="h-10 w-10 text-[#6c5ce7] mx-auto" />, label: "Checking Compliance"
+    },
+    {
+      icon: <Rocket className="h-10 w-10 text-[#00b894] mx-auto" />, label: "Finalizing Token Details"
+    },
+    {
+      icon: <Database className="h-10 w-10 text-[#fd79a8] mx-auto" />, label: "Validating Registry"
+    },
+    {
+      icon: <Leaf className="h-10 w-10 text-[#00b894] mx-auto" />, label: "Environmental Review"
+    },
+    {
+      icon: <User className="h-10 w-10 text-[#4a90e2] mx-auto" />, label: "Ownership Confirmation"
+    },
+  ]
 
   const {
     register,
@@ -141,9 +170,25 @@ export function RwaTokenizeForm() {
       toast.error("Please connect your wallet first")
       return
     }
-    
     setIsSubmitting(true)
     setMintedAmount("")
+    setShowVerification(true)
+    setVerificationStep(0)
+    setVerificationProgress(0)
+    setVerificationDone(false)
+
+    // Animate through verification steps (total ~7 seconds)
+    const stepDuration = 1000 // ms per step, 6 steps = 6s, +1s for tick
+    for (let i = 0; i < verificationSteps.length; i++) {
+      setVerificationStep(i)
+      setVerificationProgress(((i + 1) / verificationSteps.length) * 100)
+      await new Promise((resolve) => setTimeout(resolve, stepDuration))
+    }
+    setVerificationProgress(100)
+    setVerificationDone(true)
+    // Wait 1s for the green tick and confirmation
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    setShowVerification(false)
     
     try {
       // Initialize web3 service
@@ -569,6 +614,87 @@ export function RwaTokenizeForm() {
               </p>
             </div>
           </Card>
+        </div>
+      )}
+      {showVerification && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            className="w-full max-w-md"
+          >
+            <Card className="relative bg-white border-4 border-[#1a2332] shadow-[12px_12px_0px_0px_#4a90e2] rounded-xl p-8 animate-fade-in">
+              <div className="text-center mb-6">
+                {!verificationDone ? (
+                  <>
+                    <motion.div
+                      key={verificationStep}
+                      initial={{ y: 30, opacity: 0, scale: 0.8 }}
+                      animate={{ y: 0, opacity: 1, scale: 1 }}
+                      exit={{ y: -30, opacity: 0, scale: 0.8 }}
+                      transition={{ duration: 0.5, type: "spring" }}
+                      className="mb-4"
+                    >
+                      {verificationSteps[verificationStep].icon}
+                    </motion.div>
+                    <motion.h2
+                      key={verificationStep + '-label'}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.4 }}
+                      className="text-2xl font-black font-space-grotesk text-[#1a2332] mb-2"
+                    >
+                      {verificationSteps[verificationStep].label}
+                    </motion.h2>
+                    <div className="flex justify-center gap-2 mb-4">
+                      {verificationSteps.map((step, idx) => (
+                        <motion.span
+                          key={step.label}
+                          className={`w-3 h-3 rounded-full border-2 ${
+                            idx <= verificationStep
+                              ? 'bg-[#4a90e2] border-[#4a90e2]' : 'bg-[#f5f5f5] border-[#1a2332]'
+                          } transition-all`}
+                          animate={{ scale: idx === verificationStep ? 1.3 : 1 }}
+                          transition={{ type: "spring", stiffness: 300 }}
+                        />
+                      ))}
+                    </div>
+                    <div className="w-full h-4 bg-[#f5f5f5] border-2 border-[#1a2332] rounded-full overflow-hidden mb-2">
+                      <motion.div
+                        className="h-full bg-[#4a90e2]"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${verificationProgress}%` }}
+                        transition={{ duration: 0.5 }}
+                      />
+                    </div>
+                    <p className="text-sm font-mono text-[#2d3748] font-bold mt-2">
+                      Step {verificationStep + 1} of {verificationSteps.length}
+                    </p>
+                    <div className="flex justify-center mt-4">
+                      <Loader2 className="h-8 w-8 animate-spin text-[#4a90e2]" />
+                    </div>
+                  </>
+                ) : (
+                  <motion.div
+                    initial={{ scale: 0.7, opacity: 0 }}
+                    animate={{ scale: 1.1, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 200, damping: 10 }}
+                    className="flex flex-col items-center justify-center"
+                  >
+                    <CheckCircle className="h-20 w-20 text-green-500 mb-4 animate-pulse" />
+                    <h2 className="text-2xl font-black font-space-grotesk text-green-600 mb-2 animate-fade-in">
+                      Verification Complete!
+                    </h2>
+                    <p className="text-lg font-mono text-[#1a2332] font-bold animate-fade-in">
+                      Proceeding to tokenize your asset...
+                    </p>
+                  </motion.div>
+                )}
+              </div>
+            </Card>
+          </motion.div>
         </div>
       )}
     </>
