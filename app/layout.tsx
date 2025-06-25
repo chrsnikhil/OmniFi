@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   title: 'OmniFi',
   description: 'Growing Assets to infinity and beyond',
   generator: 'Chris and Aditya',
+  icons: {
+    icon: '/icon.png',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
