@@ -35,38 +35,9 @@
   }
   body {
     @apply bg-background text-foreground;
-    /* Remove all custom Privy CSS variables to restore default Privy modal styles */
-    /*
-    --privy-border-radius-sm: 0px;
-    --privy-border-radius-md: 0px;
-    --privy-border-radius-lg: 0px;
-    --privy-border-radius-full: 0px;
-    --privy-color-background: #f5f5f5;
-    --privy-color-background-2: #fff;
-    --privy-color-background-3: #4a90e2;
-    --privy-color-foreground: #1a2332;
-    --privy-color-foreground-2: #2d3748;
-    --privy-color-foreground-3: #6c5ce7;
-    --privy-color-foreground-4: #fdcb6e;
-    --privy-color-foreground-accent: #00b894;
-    --privy-color-accent: #4a90e2;
-    --privy-color-accent-light: #6c5ce7;
-    --privy-color-accent-lightest: #e3f0fc;
-    --privy-color-accent-dark: #1a2332;
-    --privy-color-accent-darkest: #000;
-    --privy-color-success: #00b894;
-    --privy-color-error: #fd79a8;
-    --privy-color-error-light: #e3f0fc;
-    --privy-color-warning: #4a90e2;
-    --privy-color-warning-light: #e3f0fc;
-    --privy-color-warning-dark: #1a2332;
-    */
     font-family: 'Space Grotesk', sans-serif;
   }
 }
-
-/* Import Space Grotesk font */
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap");
 
 /* Custom Font Classes */
 .font-space-grotesk {
