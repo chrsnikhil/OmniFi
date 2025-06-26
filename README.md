@@ -1,7 +1,7 @@
 # 🌍 OmniFi — Automated Cross-Chain RWA Vault  
 ### 🔗 Built for the Chainlink Spring 2025 Hackathon
 
-[![OmniFi Thumbnail](https://github.com/chrsnikhil/OmniFi/blob/main/public/thumbnail.png?raw=true)](https://www.youtube.com/watch?v=YOUR_VIDEO_LINK)
+[![OmniFi Thumbnail](https://github.com/chrsnikhil/OmniFi/blob/main/public/icon.png?raw=true)](https://github.com/chrsnikhil/OmniFi/blob/main/public/icon.png)
 
 ---
 
