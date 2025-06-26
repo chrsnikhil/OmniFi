@@ -2,7 +2,7 @@
 ### 🔗 Built for the Chainlink Spring 2025 Hackathon
 
 <a href="https://github.com/chrsnikhil/OmniFi/blob/main/public/icon.png">
-  <img src="https://github.com/chrsnikhil/OmniFi/blob/main/public/icon.png?raw=true" width="200" alt="OmniFi Thumbnail"/>
+  <img src="https://github.com/chrsnikhil/OmniFi/blob/main/public/icon.png?raw=true" width="800" alt="OmniFi Thumbnail"/>
 </a>
 
 ---
