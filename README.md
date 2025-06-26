@@ -92,7 +92,7 @@ OmniFi combines **Chainlink Automation**, **Data Feeds**, and **CCIP** to build 
 ## 👨‍💻 Built By
 
 - 🧠 **Chris Nikhil** – [@chrsnikhil](https://github.com/chrsnikhil)
-- 🧠 **Aditya** – [@chrsnikhil](https://github.com/alienworld1)
+- 🧠 **Aditya** – [@aditya](https://github.com/alienworld1)
 - 🎨 UX by Team OmniFi
 - 🤝 Built with 💙 at the Chainlink Chromium Hackathon
 
