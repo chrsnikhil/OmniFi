@@ -74,7 +74,7 @@ OmniFi combines **Chainlink Automation**, **Data Feeds**, and **CCIP** to build 
 |----------|-------|-----------------------|-------------|
 | **Vault** | [Vault.sol](https://github.com/chrsnikhil/OmniFi/blob/main/hardhat/contracts/Vault.sol) | ⚙️ Automation<br>📊 Data Feeds | Handles deposits, tracks ETH/USD via Chainlink Data Feeds, automates rebalancing when volatility exceeds 5% using Automation. |
 | **TransferCoordinator** | [TransferCoordinator.sol](https://github.com/chrsnikhil/OmniFi/blob/main/hardhat/contracts/TransferCoordinator.sol) | 🔗 Functions | Uses Chainlink Functions to fetch external yield data (via off-chain JavaScript). Coordinates secure cross-chain transfers. |
-| **MockPriceFeed** | [MockPriceFeed.sol](https://github.com/chrsnikhil/OmniFi/blob/main/hardhat/contracts/MockPriceFeed.sol) | 🧪 Data Feeds (Mock) | A mock contract to simulate Chainlink Data Feeds in local testing environments. |
+| **MockPriceFeed** | [MockPriceFeed.sol](https://github.com/chrsnikhil/OmniFi/blob/main/hardhat/contracts/MockPriceFeed.sol) | 🧪 Data Feeds  | Contract to utilise Chainlink Data Feeds for valuation of assets by fetching ETH Price in USD. |
 
 ---
 
