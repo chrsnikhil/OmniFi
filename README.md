@@ -10,7 +10,7 @@
 ## 🌐 Live Demo
 🖥️ **Website**: [omni-fi-ruxn.vercel.app](https://omni-fi-ruxn.vercel.app/)  
 💻 **GitHub**: [github.com/chrsnikhil/OmniFi](https://github.com/chrsnikhil/OmniFi)  
-🎥 **Demo Video**: [YouTube - OmniFi Walkthrough](https://www.youtube.com/watch?v=p5QgPkqkzFU&t=55s)
+🎥 **Demo Video**: [YouTube - OmniFi Walkthrough](https://www.youtube.com/watch?v=p5QgPkqkzFU&t)
 
 ---
 
