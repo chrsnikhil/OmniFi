@@ -68,12 +68,52 @@ OmniFi combines **Chainlink Automation**, **Data Feeds**, and **CCIP** to build 
 - 🔐 **Access Control** – Verified mint & burn with audit logs on Snowtrace.
 
 ---
+## 📜 Smart Contracts Overview
+
+| Contract | File | Chainlink Integration | Description |
+|----------|-------|-----------------------|-------------|
+| **Vault** | [Vault.sol](https://github.com/chrsnikhil/OmniFi/blob/main/hardhat/contracts/Vault.sol) | ⚙️ Automation<br>📊 Data Feeds | Handles deposits, tracks ETH/USD via Chainlink Data Feeds, automates rebalancing when volatility exceeds 5% using Automation. |
+| **TransferCoordinator** | [TransferCoordinator.sol](https://github.com/chrsnikhil/OmniFi/blob/main/hardhat/contracts/TransferCoordinator.sol) | 🔗 Functions | Uses Chainlink Functions to fetch external yield data (via off-chain JavaScript). Coordinates secure cross-chain transfers. |
+| **MockPriceFeed** | [MockPriceFeed.sol](https://github.com/chrsnikhil/OmniFi/blob/main/hardhat/contracts/MockPriceFeed.sol) | 🧪 Data Feeds (Mock) | A mock contract to simulate Chainlink Data Feeds in local testing environments. |
+
+---
+
+### 📊 Chainlink Data Feeds — `Vault.sol`
+- `import "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";`
+- Uses `AggregatorV3Interface` for `priceFeed`.
+- `getLatestPrice()` fetches `latestRoundData()`
+- Dynamically adjusts deposit limits + calculates volatility.
+
+---
+
+### ⚙️ Chainlink Automation — `Vault.sol`
+- `import "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol";`
+- Implements `AutomationCompatibleInterface`
+- `checkUpkeep()` monitors conditions
+- `performUpkeep()` executes automated rebalancing
+
+---
+
+### 🔗 Chainlink Functions — `TransferCoordinator.sol`
+- `import "@chainlink/contracts/src/v0.8/functions/v1_0_0/FunctionsClient.sol";`
+- `import "@chainlink/contracts/src/v0.8/functions/v1_0_0/libraries/FunctionsRequest.sol";`
+- Extends `FunctionsClient`
+- `_requestYieldData()` sends external data request
+- `fulfillRequest()` handles callback
+- `_getYieldFetchingSource()` contains the JS code for off-chain fetch
+
+---
+
+### 🧪 Mock / Testing — `MockPriceFeed.sol`
+- `import "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";`
+- Provides mock data for local Data Feed testing
+
 
 ## ⚙️ Chainlink Service Flow
 
 - 📡 **Data Feeds** track ETH/USD prices in real time.
 - ⚠️ If volatility exceeds 5%, **Automation** initiates rebalancing across chains.
-- 🌉 **CCIP** allows cross-chain mint & burn operations with complete traceability.
+- 🌉 **CCIP(mimiced with chainlink functions)** allows cross-chain mint & burn operations with complete traceability.
 - 🧠 All contracts governed by secure logic and event logging.
 
 ---
